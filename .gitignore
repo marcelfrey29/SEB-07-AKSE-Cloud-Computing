@@ -119,3 +119,7 @@ sw.*
 *.launch
 .settings/
 *.sublime-workspace
+
+# Volumes
+
+.storage/

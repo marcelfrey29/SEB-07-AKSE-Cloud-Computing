@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+
+  keycloak-db:
+    image: postgres:14.0-alpine
+    container_name: keycloak-db
+    volumes:
+      - "./.storage/keycloak-db/data:/var/lib/postgresql/data"
+    networks:
+      - keycloak
+    environment:
+      - "POSTGRES_USER=${KEYCLOAK_DB_USER_NAME}"
+      - "POSTGRES_PASSWORD=${KEYCLOAK_DB_USER_PASSWORD}"
+      - "POSTGRES_DB=${KEYCLOAK_DB_TABLE_NAME}"
+
+  keycloak:
+    image: jboss/keycloak:15.0.2
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    networks:
+      - keycloak
+    environment:
+      # Configure Account
+      - "KEYCLOAK_USER=${KEYCLOAK_USER}"
+      - "KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}"
+      # Configure Database
+      - "DB_VENDOR=${KEYCLOAK_VENDOR}"
+      - "DB_ADDR=${KEYCLOAK_ADDR}"
+      - "DB_PORT=${KEYCLOAK_DB_PORT}"
+      - "DB_USER=${KEYCLOAK_DB_USER_NAME}"
+      - "DB_PASSWORD=${KEYCLOAK_DB_USER_PASSWORD}"
+      - "DB_DATABASE=${KEYCLOAK_DB_TABLE_NAME}"
+    depends_on:
+      - keycloak-db
+
+networks:
+  keycloak:

@@ -7,7 +7,7 @@ export default {
 
     // Global page headers: https://go.nuxtjs.dev/config-head
     head: {
-        title: 'todo-frontend',
+        title: 'Todo App',
         htmlAttrs: {
             lang: 'en',
         },
@@ -44,6 +44,8 @@ export default {
         'bootstrap-vue/nuxt',
         // https://go.nuxtjs.dev/axios
         '@nuxtjs/axios',
+        // Auth
+        '@nuxtjs/auth-next',
     ],
 
     // Axios module configuration: https://go.nuxtjs.dev/config-axios

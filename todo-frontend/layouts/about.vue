@@ -6,9 +6,21 @@
             <b-navbar-nav v-if="!$auth.loggedIn" class="ml-auto">
                 <b-button variant="light" @click="login">Sign in</b-button>
             </b-navbar-nav>
+
+            <b-navbar-nav v-else class="ml-auto">
+                <b-button variant="light" @click="$router.push('/dashboard')"
+                    >Open Application</b-button
+                >
+            </b-navbar-nav>
         </b-navbar>
 
-        <Nuxt />
+        <b-container>
+            <b-row>
+                <b-col>
+                    <Nuxt />
+                </b-col>
+            </b-row>
+        </b-container>
 
         <Footer></Footer>
     </div>

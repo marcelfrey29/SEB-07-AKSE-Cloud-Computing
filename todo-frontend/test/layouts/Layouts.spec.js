@@ -1,5 +1,5 @@
 // import {mount} from '@vue/test-utils'
-// import About from '@/layouts/about.vue'
+// import About from '@/layouts/index.vue'
 // import Default from '@/layouts/default.vue'
 
 // describe('About Layout', () => {

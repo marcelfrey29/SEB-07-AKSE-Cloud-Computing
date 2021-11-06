@@ -13,6 +13,7 @@ services:
       - "POSTGRES_USER=${KEYCLOAK_DB_USER_NAME}"
       - "POSTGRES_PASSWORD=${KEYCLOAK_DB_USER_PASSWORD}"
       - "POSTGRES_DB=${KEYCLOAK_DB_TABLE_NAME}"
+    restart: always
 
   keycloak:
     build: "./keycloak"
@@ -38,6 +39,7 @@ services:
       - "DB_DATABASE=${KEYCLOAK_DB_TABLE_NAME}"
     depends_on:
       - keycloak-db
+    restart: always
 
   todo-frontend:
     build: "./todo-frontend"
@@ -50,6 +52,7 @@ services:
       - frontend
     environment:
       - "HOST=0.0.0.0"
+    restart: always
 
 networks:
   keycloak:

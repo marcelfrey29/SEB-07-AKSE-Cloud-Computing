@@ -1,11 +1,16 @@
 <template>
     <div>
-        About the Todo App
-        <div v-if="!$auth.loggedIn">
-            <b-button variant="primary" @click="login">Login</b-button>
-        </div>
-        <hr />
+        <b-navbar type="dark" variant="primary">
+            <b-navbar-brand>Todo App</b-navbar-brand>
+
+            <b-navbar-nav v-if="!$auth.loggedIn" class="ml-auto">
+                <b-button variant="light" @click="login">Sign in</b-button>
+            </b-navbar-nav>
+        </b-navbar>
+
         <Nuxt />
+
+        <Footer></Footer>
     </div>
 </template>
 

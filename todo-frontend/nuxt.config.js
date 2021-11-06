@@ -53,4 +53,58 @@ export default {
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {},
+
+    auth: {
+        strategies: {
+            local: false,
+            keycloak: {
+                scheme: 'oauth2',
+                endpoints: {
+                    authorization:
+                        process.env.NUXT_ENV_KEYCLOAK_HOST +
+                        `/auth/realms/` +
+                        process.env.NUXT_ENV_KEYCLOAK_REALM +
+                        `/protocol/openid-connect/auth`,
+                    userInfo:
+                        process.env.NUXT_ENV_KEYCLOAK_HOST +
+                        `/auth/realms/` +
+                        process.env.NUXT_ENV_KEYCLOAK_REALM +
+                        `/protocol/openid-connect/userinfo`,
+                    token:
+                        process.env.NUXT_ENV_KEYCLOAK_HOST +
+                        `/auth/realms/` +
+                        process.env.NUXT_ENV_KEYCLOAK_REALM +
+                        `/protocol/openid-connect/token`,
+                    logout:
+                        process.env.NUXT_ENV_KEYCLOAK_HOST +
+                        `/auth/realms/` +
+                        process.env.NUXT_ENV_KEYCLOAK_REALM +
+                        `/protocol/openid-connect/logout?redirect_uri=` +
+                        encodeURIComponent(
+                            process.env.NUXT_ENV_KEYCLOAK_REDIRECT_URI
+                        ),
+                },
+                token: {
+                    property: 'access_token',
+                    type: 'Bearer',
+                    name: 'Authorization',
+                    maxAge: 1800,
+                },
+                refreshToken: {
+                    property: 'refresh_token',
+                    maxAge: 60 * 60 * 24 * 30,
+                },
+                responseType: 'code',
+                grantType: 'authorization_code',
+                clientId: process.env.NUXT_ENV_KEYCLOAK_CLIENT_ID,
+                scope: ['openid', 'profile', 'email'],
+                codeChallengeMethod: 'S256',
+            },
+        },
+        redirect: {
+            login: '/about',
+            logout: '/about',
+            home: false,
+        },
+    },
 }

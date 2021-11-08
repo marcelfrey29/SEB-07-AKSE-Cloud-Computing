@@ -22,6 +22,7 @@ build-frontend:
   image: $FRONTEND_IMAGE
   script:
     - cd todo-frontend
+    - npm install
     - npm run build
     - echo "Build complete."
 

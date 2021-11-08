@@ -118,9 +118,10 @@ export default class Default extends Vue {
     }
 
     get getAvatarName(): string {
-        const user: LoggedInUser | null = this.$auth.user
+        const unknownUser: Record<string, unknown> | null = this.$auth.user
         let name = ''
-        if (user) {
+        if (unknownUser) {
+            const user: LoggedInUser = unknownUser as any as LoggedInUser
             name = '' + user.given_name[0] + '' + user.family_name[0]
         }
         return name

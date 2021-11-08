@@ -1,0 +1,59 @@
+# GitLab Documentation
+# https://docs.gitlab.com/ee/ci/yaml/
+
+# Stages
+stages:
+  - build
+  - test
+  - deploy
+
+# Variables for the project
+variables:
+  FRONTEND_IMAGE: "node:16-alpine"
+
+# Cache
+cache:
+  paths:
+    - "/node_modules"
+
+# Frontend
+build-frontend:
+  stage: build
+  image: $FRONTEND_IMAGE
+  script:
+    - cd todo-frontend
+    - npm run build
+    - echo "Build complete."
+
+test-frontend-unit:
+  stage: test
+  image: $FRONTEND_IMAGE
+  script:
+    - cd todo-frontend
+    - npm run test
+    - echo "Unit Tests complete."
+
+test-frontend-style-prettier:
+  stage: test
+  image: $FRONTEND_IMAGE
+  script:
+    - cd todo-frontend
+    - npm run lint:check:style
+    - echo "Prettier Checks complete."
+
+test-frontend-style-eslint:
+  stage: test
+  image: $FRONTEND_IMAGE
+  script:
+    - cd todo-frontend
+    - npm run lint:check:js
+    - echo "ESLint Checks complete."
+
+deploy-frontend:
+  stage: deploy
+  image: $FRONTEND_IMAGE
+  when: manual
+  script:
+    - cd todo-frontend
+    - echo "TODO."
+    - echo "Deploy complete."

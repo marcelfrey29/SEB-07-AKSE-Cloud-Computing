@@ -10,8 +10,8 @@ stages:
 
 # Variables
 variables:
-  FRONTEND_NODE_MODULES_PATH: "frontend/npm"
-  FRONTEND_DIST_FOLDER_PATH: "frontend/dist/"
+  FRONTEND_NODE_MODULES_PATH: ".npm"
+  FRONTEND_DIST_FOLDER_PATH: "dist/"
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -23,9 +23,10 @@ variables:
     RULES_CHANGE_PATH: "todo-frontend/**/*"
   image: "node:16-alpine"
   cache:
-    key: $CI_COMMIT_REF_SLUG
+    #key: $CI_COMMIT_REF_SLUG
+    key: frontend-cache
     paths:
-      - $FRONTEND_NODE_MODULES_PATH
+      - $FRONTEND_NODE_MODULES_PATH/
       - $FRONTEND_DIST_FOLDER_PATH
 #  before_script:
 #    - echo $PATH

@@ -1,60 +1,103 @@
 # GitLab Documentation
 # https://docs.gitlab.com/ee/ci/yaml/
 
-# Stages
+# Stages (executed in the order they are defined: build, test, deploy)
 stages:
+  - setup
   - build
   - test
   - deploy
 
-# Variables for the project
+# Variables
 variables:
-  FRONTEND_IMAGE: "node:16-alpine"
+  FRONTEND_DIST_FOLDER_CACHE_KEY: "frontend-dist"
+  FRONTEND_DIST_FOLDER_PATH: "dist/"
 
 # Cache
 cache:
+  key: $CI_COMMIT_REF_SLUG
   paths:
-    - "/node_modules"
+    - "frontend/.npm"
+    - $FRONTEND_DIST_FOLDER_PATH
+
+# Base Rules (other jobs can extend / inherit from this rule)
+.base:
+  timeout: 60 minutes
+
+.frontend-base:
+  extends: .base
+  variables:
+    RULES_CHANGE_PATH: "todo-frontend/**/*"
+  image: "node:16-alpine"
+  cache:
+    key: $FRONTEND_DIST_FOLDER_CACHE_KEY
+    paths:
+      - $FRONTEND_DIST_FOLDER_PATH
 
 # Frontend
-build-frontend:
-  stage: build
-  image: $FRONTEND_IMAGE
+setup-frontend:
+  extends: .frontend-base
+  stage: setup
+  needs: [ ]
   script:
+    - npm ci --cache frontend/.npm --prefer-offline
+    - echo "Configured npm to use the local cache."
     - cd todo-frontend
     - npm install
-    - npm run build
+    - echo "Installed Dependencies."
+
+build-frontend:
+  extends: .frontend-base
+  stage: build
+  needs:
+    - setup-frontend
+  script:
+    - cd todo-frontend
+    - npm run generate
     - echo "Build complete."
 
 test-frontend-unit:
+  extends: .frontend-base
   stage: test
-  image: $FRONTEND_IMAGE
+  needs:
+    - build-frontend
   script:
     - cd todo-frontend
     - npm run test
     - echo "Unit Tests complete."
 
 test-frontend-style-prettier:
+  extends: .frontend-base
   stage: test
-  image: $FRONTEND_IMAGE
+  needs:
+    - build-frontend
   script:
     - cd todo-frontend
     - npm run lint:check:style
     - echo "Prettier Checks complete."
 
 test-frontend-style-eslint:
+  extends: .frontend-base
   stage: test
-  image: $FRONTEND_IMAGE
+  needs:
+    - build-frontend
   script:
     - cd todo-frontend
     - npm run lint:check:js
     - echo "ESLint Checks complete."
 
 deploy-frontend:
+  extends: .frontend-base
   stage: deploy
-  image: $FRONTEND_IMAGE
-  when: manual
+  needs:
+    - test-frontend-unit
+    - test-frontend-style-prettier
+    - test-frontend-style-eslint
+  #when: manual
   script:
     - cd todo-frontend
-    - echo "TODO."
+    - echo "TODO - Deploy..."
+    - cd dist
+    - ls -la
+    - cat index.html
     - echo "Deploy complete."

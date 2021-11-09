@@ -40,10 +40,8 @@ setup-frontend:
   stage: setup
   needs: [ ]
   script:
-    - npm ci --cache frontend/.npm --prefer-offline
-    - echo "Configured npm to use the local cache."
     - cd todo-frontend
-    - npm install
+    - npm ci --cache frontend/.npm --prefer-offline
     - echo "Installed Dependencies."
 
 build-frontend:

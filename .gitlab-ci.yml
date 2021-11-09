@@ -27,6 +27,11 @@ variables:
     paths:
       - $FRONTEND_NODE_MODULES_PATH
       - $FRONTEND_DIST_FOLDER_PATH
+  before_script:
+    - echo $PATH
+    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
+    - echo $PATH
+    - echo "Setup PATH"
 
 # Frontend
 setup-frontend:

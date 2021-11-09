@@ -27,11 +27,11 @@ variables:
     paths:
       - $FRONTEND_NODE_MODULES_PATH
       - $FRONTEND_DIST_FOLDER_PATH
-  before_script:
-    - echo $PATH
-    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
-    - echo $PATH
-    - echo "Setup PATH"
+#  before_script:
+#    - echo $PATH
+#    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
+#    - echo $PATH
+#    - echo "Setup PATH"
 
 # Frontend
 setup-frontend:
@@ -50,7 +50,7 @@ build-frontend:
     - setup-frontend
   script:
     - cd todo-frontend
-    - npm run generate
+    - PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin" npm run generate
     - echo "Build complete."
     - cp -r dist/ $FRONTEND_DIST_FOLDER_PATH
     - echo "Cached Build Artefacts."
@@ -62,7 +62,7 @@ test-frontend-unit:
     - build-frontend
   script:
     - cd todo-frontend
-    - npm run test
+    - PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin" npm run test
     - echo "Unit Tests complete."
 
 test-frontend-style-prettier:
@@ -72,7 +72,7 @@ test-frontend-style-prettier:
     - build-frontend
   script:
     - cd todo-frontend
-    - npm run lint:check:style
+    - PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin" npm run lint:check:style
     - echo "Prettier Checks complete."
 
 test-frontend-style-eslint:
@@ -82,7 +82,7 @@ test-frontend-style-eslint:
     - build-frontend
   script:
     - cd todo-frontend
-    - npm run lint:check:js
+    - PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin" npm run lint:check:js
     - echo "ESLint Checks complete."
 
 deploy-frontend:

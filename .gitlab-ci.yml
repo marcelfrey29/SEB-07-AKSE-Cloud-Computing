@@ -10,15 +10,8 @@ stages:
 
 # Variables
 variables:
-  FRONTEND_DIST_FOLDER_CACHE_KEY: "frontend-dist"
-  FRONTEND_DIST_FOLDER_PATH: "dist/"
-
-# Cache
-cache:
-  key: $CI_COMMIT_REF_SLUG
-  paths:
-    - "frontend/.npm"
-    - $FRONTEND_DIST_FOLDER_PATH
+  FRONTEND_NODE_MODULES_PATH: "frontend/npm"
+  FRONTEND_DIST_FOLDER_PATH: "frontend/dist/"
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -30,8 +23,9 @@ cache:
     RULES_CHANGE_PATH: "todo-frontend/**/*"
   image: "node:16-alpine"
   cache:
-    key: $FRONTEND_DIST_FOLDER_CACHE_KEY
+    key: $CI_COMMIT_REF_SLUG
     paths:
+      - $FRONTEND_NODE_MODULES_PATH
       - $FRONTEND_DIST_FOLDER_PATH
 
 # Frontend
@@ -41,7 +35,7 @@ setup-frontend:
   needs: [ ]
   script:
     - cd todo-frontend
-    - npm ci --cache frontend/.npm --prefer-offline
+    - npm ci --cache $FRONTEND_NODE_MODULES_PATH --prefer-offline
     - echo "Installed Dependencies."
 
 build-frontend:
@@ -53,6 +47,8 @@ build-frontend:
     - cd todo-frontend
     - npm run generate
     - echo "Build complete."
+    - cp -r dist/ $FRONTEND_DIST_FOLDER_PATH
+    - echo "Cached Build Artefacts."
 
 test-frontend-unit:
   extends: .frontend-base
@@ -95,7 +91,7 @@ deploy-frontend:
   script:
     - cd todo-frontend
     - echo "TODO - Deploy..."
-    - cd dist
+    - cd $FRONTEND_DIST_FOLDER_PATH
     - ls -la
     - cat index.html
     - echo "Deploy complete."

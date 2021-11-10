@@ -7,11 +7,12 @@ stages:
   - build
   - test
   - deploy
-  - clenup
+  - cleanup
 
 # Variables
 variables:
-  FRONTEND_RULES_CHANGE_PATH: "todo-frontend/**/*"
+  TERRAFORM_ROOT_DIRECTORY: ${CI_PROJECT_DIR}/terraform/aws
+  TERRAFORM_STATE_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws/aws-prod
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -24,12 +25,27 @@ variables:
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory
   cache:
-    key: $CI_COMMIT_REF_SLUG-frontend-cache
-    paths:
-      - "todo-frontend/node_modules"
-      - "todo-frontend/dist"
+    - key: $CI_COMMIT_REF_SLUG-frontend-cache
+      paths:
+        - "todo-frontend/node_modules"
+    - key: frontend-deploy-files
+      paths:
+        - "todo-frontend/dist"
   before_script:
     - cd todo-frontend
+
+.infrastructure-base:
+  extends: .base
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  cache:
+    - key: terraform-cache-aws-prod
+      paths:
+        - $TERRAFORM_ROOT_DIRECTORY/.terraform
+    - key: frontend-deploy-files
+      paths:
+        - "todo-frontend/dist"
+  before_script:
+    - cd $TERRAFORM_ROOT_DIRECTORY
 
 # Frontend
 setup-frontend:
@@ -76,19 +92,68 @@ test-frontend-style-eslint:
     - npm run lint:check:js
     - echo "ESLint Checks complete."
 
-deploy-frontend:
-  extends: .frontend-base
+# Terraform
+init-infrastructure:
+  extends: .infrastructure-base
+  stage: setup
+  needs: [ ]
+  script:
+    - gitlab-terraform init
+    - echo "Initialized Terraform."
+
+validate-infrastructure:
+  extends: .infrastructure-base
+  stage: test
+  needs:
+    - init-infrastructure
+  script:
+    - gitlab-terraform validate
+    - echo "Validated Terraform Code."
+
+plan-deployment:
+  extends: .infrastructure-base
+  stage: test
+  needs:
+    - validate-infrastructure
+  script:
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+    - cd ../todo-frontend/dist
+    - ls -la
+    - echo "Plan of Frontend Deploy complete."
+  artifacts:
+    name: plan
+    paths:
+      - ${TERRAFORM_ROOT_DIRECTORY}/plan.cache
+    reports:
+      terraform: ${TERRAFORM_ROOT_DIRECTORY}/plan.json
+
+deployment:
+  extends: .infrastructure-base
   stage: deploy
   needs:
+    - plan-deployment
     - test-frontend-unit
     - test-frontend-style-prettier
     - test-frontend-style-eslint
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: manual
   script:
-    - echo "TODO - Deploy..."
-    - cd dist
+    - gitlab-terraform apply
+    - cd ../todo-frontend/dist
     - ls -la
-    - cat index.html
-    - echo "Deploy complete."
+    - echo "Frontend Deploy complete."
+  environment:
+    name: production
+  #  rules:
+  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #      when: manual
+  when: manual
+
+destroy:
+  extends: .infrastructure-base
+  stage: cleanup
+  script:
+    - gitlab-terraform destroy
+    - echo "Destroy complete."
+  environment:
+    name: production
+  when: manual

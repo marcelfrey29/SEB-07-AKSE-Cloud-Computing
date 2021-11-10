@@ -23,8 +23,8 @@ stages:
     #key: $CI_COMMIT_REF_SLUG
     key: frontend-cache
     paths:
-      - "node_modules/"
-      - "dist/"
+      - "node_modules"
+      - "dist"
 #  before_script:
 #    - echo $PATH
 #    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
@@ -41,7 +41,7 @@ setup-frontend:
     - npm ci
     - ls -la
     - cd node_modules
-    - cd -la
+    - ls -la
     - echo "Installed Dependencies."
 
 build-frontend:

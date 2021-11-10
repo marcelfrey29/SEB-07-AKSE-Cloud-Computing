@@ -7,6 +7,11 @@ stages:
   - build
   - test
   - deploy
+  - clenup
+
+# Variables
+variables:
+  FRONTEND_RULES_CHANGE_PATH: "todo-frontend/**/*"
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -14,22 +19,17 @@ stages:
 
 .frontend-base:
   extends: .base
-  variables:
-    RULES_CHANGE_PATH: "todo-frontend/**/*"
   image: "node:16-alpine"
   # Cache only works for directories inside the project!
   # Caching the same directory in different projects can be realized by different cache-keys
+  # The cache path has to be relative to the root directory
   cache:
-    #key: $CI_COMMIT_REF_SLUG
-    key: frontend-cache
+    key: $CI_COMMIT_REF_SLUG-frontend-cache
     paths:
       - "todo-frontend/node_modules"
       - "todo-frontend/dist"
-#  before_script:
-#    - echo $PATH
-#    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
-#    - echo $PATH
-#    - echo "Setup PATH"
+  before_script:
+    - cd todo-frontend
 
 # Frontend
 setup-frontend:
@@ -37,11 +37,7 @@ setup-frontend:
   stage: setup
   needs: [ ]
   script:
-    - cd todo-frontend
     - npm ci
-    - ls -la
-    - cd node_modules
-    - ls -la
     - echo "Installed Dependencies."
 
 build-frontend:
@@ -50,7 +46,6 @@ build-frontend:
   needs:
     - setup-frontend
   script:
-    - cd todo-frontend
     - npm run generate
     - echo "Build complete."
 
@@ -60,7 +55,6 @@ test-frontend-unit:
   needs:
     - build-frontend
   script:
-    - cd todo-frontend
     - npm run test
     - echo "Unit Tests complete."
 
@@ -70,7 +64,6 @@ test-frontend-style-prettier:
   needs:
     - build-frontend
   script:
-    - cd todo-frontend
     - npm run lint:check:style
     - echo "Prettier Checks complete."
 
@@ -80,7 +73,6 @@ test-frontend-style-eslint:
   needs:
     - build-frontend
   script:
-    - cd todo-frontend
     - npm run lint:check:js
     - echo "ESLint Checks complete."
 
@@ -91,9 +83,10 @@ deploy-frontend:
     - test-frontend-unit
     - test-frontend-style-prettier
     - test-frontend-style-eslint
-  #when: manual
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
   script:
-    - cd todo-frontend
     - echo "TODO - Deploy..."
     - cd dist
     - ls -la

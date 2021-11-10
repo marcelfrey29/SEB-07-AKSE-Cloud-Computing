@@ -8,11 +8,6 @@ stages:
   - test
   - deploy
 
-# Variables
-variables:
-  FRONTEND_NODE_MODULES_PATH: "node_modules/"
-  FRONTEND_DIST_FOLDER_PATH: "dist/"
-
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
   timeout: 60 minutes
@@ -28,8 +23,8 @@ variables:
     #key: $CI_COMMIT_REF_SLUG
     key: frontend-cache
     paths:
-      - $FRONTEND_NODE_MODULES_PATH
-      - $FRONTEND_DIST_FOLDER_PATH
+      - "node_modules/"
+      - "dist/"
 #  before_script:
 #    - echo $PATH
 #    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"
@@ -43,7 +38,10 @@ setup-frontend:
   needs: [ ]
   script:
     - cd todo-frontend
-    - npm ci --cache $FRONTEND_NODE_MODULES_PATH --prefer-offline
+    - npm ci
+    - ls -la
+    - cd node_modules
+    - cd -la
     - echo "Installed Dependencies."
 
 build-frontend:
@@ -97,7 +95,7 @@ deploy-frontend:
   script:
     - cd todo-frontend
     - echo "TODO - Deploy..."
-    - cd $FRONTEND_DIST_FOLDER_PATH
+    - cd dist
     - ls -la
     - cat index.html
     - echo "Deploy complete."

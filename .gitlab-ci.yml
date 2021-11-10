@@ -23,8 +23,8 @@ stages:
     #key: $CI_COMMIT_REF_SLUG
     key: frontend-cache
     paths:
-      - "node_modules"
-      - "dist"
+      - "todo-frontend/node_modules"
+      - "todo-frontend/dist"
 #  before_script:
 #    - echo $PATH
 #    - export PATH="$PATH:$FRONTEND_NODE_MODULES_PATH/.bin"

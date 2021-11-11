@@ -25,9 +25,12 @@ variables:
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory
   cache:
-    - key: $CI_COMMIT_REF_SLUG-frontend-cache
+    - key: $CI_COMMIT_REF_SLUG-frontend-node-modules-cache
       paths:
         - "todo-frontend/node_modules"
+    - key: $CI_COMMIT_REF_SLUG-frontend-npm-cache
+      paths:
+        - "todo-frontend/.npm"
     - key: frontend-deploy-files
       paths:
         - "todo-frontend/dist"
@@ -53,7 +56,7 @@ setup-frontend:
   stage: setup
   needs: [ ]
   script:
-    - npm ci
+    - npm ci --cache .npm
     - echo "Installed Dependencies."
 
 build-frontend:

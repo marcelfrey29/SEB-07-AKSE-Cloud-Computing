@@ -11,8 +11,8 @@ stages:
 
 # Variables
 variables:
-  TERRAFORM_ROOT_DIRECTORY: ${CI_PROJECT_DIR}/terraform/workspaces/aws
-  TERRAFORM_STATE_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
+  TF_ROOT: ${CI_PROJECT_DIR}/terraform/workspaces/aws
+  TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -40,12 +40,12 @@ variables:
   cache:
     - key: terraform-cache-aws-prod
       paths:
-        - $TERRAFORM_ROOT_DIRECTORY/.terraform
+        - $TF_ROOT/.terraform
     - key: frontend-deploy-files
       paths:
         - "todo-frontend/dist"
   before_script:
-    - cd $TERRAFORM_ROOT_DIRECTORY
+    - cd $TF_ROOT
 
 # Frontend
 setup-frontend:
@@ -124,9 +124,9 @@ plan-deployment:
   artifacts:
     name: plan
     paths:
-      - ${TERRAFORM_ROOT_DIRECTORY}/plan.cache
+      - ${TF_ROOT}/plan.cache
     reports:
-      terraform: ${TERRAFORM_ROOT_DIRECTORY}/plan.json
+      terraform: ${TF_ROOT}/plan.json
 
 deployment:
   extends: .infrastructure-base

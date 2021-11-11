@@ -13,7 +13,7 @@ services:
       - "POSTGRES_USER=${KEYCLOAK_DB_USER_NAME}"
       - "POSTGRES_PASSWORD=${KEYCLOAK_DB_USER_PASSWORD}"
       - "POSTGRES_DB=${KEYCLOAK_DB_TABLE_NAME}"
-    restart: always
+    restart: unless-stopped
 
   keycloak:
     build: "./keycloak"
@@ -39,7 +39,7 @@ services:
       - "DB_DATABASE=${KEYCLOAK_DB_TABLE_NAME}"
     depends_on:
       - keycloak-db
-    restart: always
+    restart: unless-stopped
 
   todo-frontend:
     build: "./todo-frontend"
@@ -52,8 +52,20 @@ services:
       - frontend
     environment:
       - "HOST=0.0.0.0"
-    restart: always
+    restart: unless-stopped
+
+  todo-service:
+    build: "./todo-service"
+    container_name: todo-service
+    volumes:
+      - "./todo-service/:/home/app"
+    ports:
+      - "4000:4000"
+    networks:
+      - backend
+    restart: unless-stopped
 
 networks:
   keycloak:
   frontend:
+  backend:

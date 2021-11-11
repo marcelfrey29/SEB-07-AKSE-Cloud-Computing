@@ -114,11 +114,12 @@ plan-deployment:
   extends: .infrastructure-base
   stage: test
   needs:
+    - build-frontend
     - validate-infrastructure
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-    - cd ../todo-frontend/dist
+    - cd ../../../todo-frontend/dist
     - ls -la
     - echo "Plan of Frontend Deploy complete."
   artifacts:
@@ -138,9 +139,9 @@ deployment:
     - test-frontend-style-eslint
   script:
     - gitlab-terraform apply
-    - cd ../todo-frontend/dist
+    - cd ../../../todo-frontend/dist
     - ls -la
-    - echo "Frontend Deploy complete."
+    - echo "Deploy complete."
   environment:
     name: production
   #  rules:

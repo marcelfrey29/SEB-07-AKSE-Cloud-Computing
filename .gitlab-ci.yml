@@ -12,7 +12,7 @@ stages:
 # Variables
 variables:
   TERRAFORM_ROOT_DIRECTORY: ${CI_PROJECT_DIR}/terraform/workspaces/aws
-  TERRAFORM_STATE_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws/aws-prod
+  TERRAFORM_STATE_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:

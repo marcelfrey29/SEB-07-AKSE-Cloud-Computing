@@ -6,6 +6,8 @@ stages:
   - setup
   - build
   - test
+  - package
+  - verify
   - deploy
   - cleanup
 
@@ -37,6 +39,30 @@ variables:
   before_script:
     - cd todo-frontend
 
+.backend-base:
+  extends: .base
+  image: "node:16-alpine"
+  cache:
+    - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
+      paths:
+        - "todo-service/node_modules"
+    - key: $CI_COMMIT_REF_SLUG-backend-npm-cache
+      paths:
+        - "todo-service/.npm"
+    - key: backend-deploy-files
+      paths:
+        - "todo-service/dist"
+  before_script:
+    - cd todo-service
+
+.package-base:
+  extends: .base
+  image: "docker"
+  cache:
+    - key: backend-deploy-files
+      paths:
+        - "todo-service/dist"
+
 .infrastructure-base:
   extends: .base
   image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
@@ -51,7 +77,7 @@ variables:
     - cd $TF_ROOT
 
 # Frontend
-setup-frontend:
+Setup Frontend:
   extends: .frontend-base
   stage: setup
   needs: [ ]
@@ -59,44 +85,83 @@ setup-frontend:
     - npm ci --cache .npm
     - echo "Installed Dependencies."
 
-build-frontend:
+Build Frontend:
   extends: .frontend-base
   stage: build
   needs:
-    - setup-frontend
+    - Setup Frontend
   script:
     - npm run generate
     - echo "Build complete."
 
-test-frontend-unit:
+Test Frontend:
   extends: .frontend-base
   stage: test
   needs:
-    - build-frontend
+    - Build Frontend
   script:
     - npm run test
     - echo "Unit Tests complete."
-
-test-frontend-style-prettier:
-  extends: .frontend-base
-  stage: test
-  needs:
-    - build-frontend
-  script:
     - npm run lint:check:style
     - echo "Prettier Checks complete."
-
-test-frontend-style-eslint:
-  extends: .frontend-base
-  stage: test
-  needs:
-    - build-frontend
-  script:
     - npm run lint:check:js
     - echo "ESLint Checks complete."
 
+# TodoService
+Setup Todo Service:
+  extends: .backend-base
+  stage: setup
+  needs: [ ]
+  script:
+    - npm ci --cache .npm
+    - echo "Installed Dependencies."
+
+Build Todo Service:
+  extends: .backend-base
+  stage: build
+  needs:
+    - Setup Todo Service
+  script:
+    - npm run build
+    - echo "Build complete."
+
+Test Todo Service:
+  extends: .backend-base
+  stage: test
+  needs:
+    - Build Todo Service
+  script:
+    - npm run test
+    - echo "Unit Tests complete."
+    - npm run format:verify
+    - echo "Prettier Checks complete."
+
+Package Todo Service:
+  extends: .package-base
+  stage: package
+  needs:
+    - Test Todo Service
+  script:
+    - cd todo-service
+    - echo "TODO..."
+    - echo "Packaged Todo-Service."
+    - echo "TODO..."
+    - echo "Uploaded Todo-Service."
+
+# Keycloak
+Package Keycloak:
+  extends: .package-base
+  stage: package
+  needs: [ ]
+  script:
+    - cd keycloak
+    - echo "TODO..."
+    - echo "Packaged Keycloak."
+    - echo "TODO..."
+    - echo "Uploaded Keycloak."
+
 # Terraform
-init-infrastructure:
+Initialize Terraform:
   extends: .infrastructure-base
   stage: setup
   needs: [ ]
@@ -104,27 +169,41 @@ init-infrastructure:
     - gitlab-terraform init
     - echo "Initialized Terraform."
 
-validate-infrastructure:
+Validate Terraform:
   extends: .infrastructure-base
   stage: test
   needs:
-    - init-infrastructure
+    - Initialize Terraform
   script:
     - gitlab-terraform validate
     - echo "Validated Terraform Code."
 
-plan-deployment:
+Plan Deployment:
   extends: .infrastructure-base
-  stage: test
+  stage: verify
   needs:
-    - build-frontend
-    - validate-infrastructure
+    - Validate Terraform
+    - Build Frontend
+    - Package Todo Service
+    - Package Keycloak
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
-    - cd ../../../todo-frontend/dist
+    - pwd
+    - cd ..
+    - pwd
+    - cd ..
+    - pwd
+    - cd ..
+    - pwd
     - ls -la
-    - echo "Plan of Frontend Deploy complete."
+    - cd todo-frontend
+    - pwd
+    - ls -la
+    - cd dist
+    - pwd
+    - ls -la
+    - echo "Planning for deployment finished."
   artifacts:
     name: plan
     paths:
@@ -132,14 +211,11 @@ plan-deployment:
     reports:
       terraform: ${TF_ROOT}/plan.json
 
-deployment:
+Deployment:
   extends: .infrastructure-base
   stage: deploy
   needs:
-    - plan-deployment
-    - test-frontend-unit
-    - test-frontend-style-prettier
-    - test-frontend-style-eslint
+    - Plan Deployment
   script:
     - gitlab-terraform apply
     - cd ../../../todo-frontend/dist
@@ -152,7 +228,7 @@ deployment:
   #      when: manual
   when: manual
 
-destroy:
+Destroy:
   extends: .infrastructure-base
   stage: cleanup
   script:

@@ -63,6 +63,7 @@ services:
       - "4000:4000"
     networks:
       - backend
+      - keycloak
     restart: unless-stopped
 
 networks:

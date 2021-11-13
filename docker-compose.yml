@@ -18,8 +18,6 @@ services:
   keycloak:
     build: "./keycloak"
     container_name: keycloak
-    volumes:
-      - "./keycloak/todo-realm.json:/tmp/todo-realm.json"
     ports:
       - "8080:8080"
     networks:
@@ -28,8 +26,6 @@ services:
       # Configure Account
       - "KEYCLOAK_USER=${KEYCLOAK_USER}"
       - "KEYCLOAK_PASSWORD=${KEYCLOAK_PASSWORD}"
-      # Import the realm
-      - "KEYCLOAK_IMPORT=/tmp/todo-realm.json"
       # Configure Database
       - "DB_VENDOR=${KEYCLOAK_VENDOR}"
       - "DB_ADDR=${KEYCLOAK_ADDR}"

@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard, KeycloakConnectModule } from 'nest-keycloak-connect';
 import { APP_GUARD } from '@nestjs/core';
+import { ListModule } from './list/list.module';
+import { DynamodbModule } from './dynamodb/dynamodb.module';
 
 @Module({
     imports: [
@@ -24,6 +26,8 @@ import { APP_GUARD } from '@nestjs/core';
                 useNestLogger: true,
             }),
         }),
+        ListModule,
+        DynamodbModule,
     ],
     controllers: [AppController],
     providers: [

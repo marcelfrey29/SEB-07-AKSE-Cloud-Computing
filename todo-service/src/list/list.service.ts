@@ -22,12 +22,12 @@ export class ListService {
      * @return {TodoList[]} the lists of the user
      */
     async getLists(user: User): Promise<TodoList[]> {
-        this.logger.log('Getting lists of user ' + user.sid);
+        this.logger.log('Getting lists of user ' + user.sub);
         const lists = await this.dynamodbService.getListsOfUser(
-            this.USER_PARTITION_PREFIX + user.sid,
+            this.USER_PARTITION_PREFIX + user.sub,
         );
         this.logger.debug(
-            'Returning ' + lists.length + ' lists for ' + user.sid,
+            'Returning ' + lists.length + ' lists for ' + user.sub,
         );
         return lists;
     }
@@ -45,10 +45,10 @@ export class ListService {
     ): Promise<TodoList[]> {
         const listID = uuidv4();
         this.logger.log(
-            'Creating new list' + listID + ' for user ' + user.sid + '',
+            'Creating new list' + listID + ' for user ' + user.sub + '',
         );
         const list: TodoList = {
-            partition: this.USER_PARTITION_PREFIX + user.sid,
+            partition: this.USER_PARTITION_PREFIX + user.sub,
             sort: this.LIST_PARTITION_PREFIX + listID,
             name: listInfo.name ?? 'New List',
             color: listInfo.color ?? 'warning',

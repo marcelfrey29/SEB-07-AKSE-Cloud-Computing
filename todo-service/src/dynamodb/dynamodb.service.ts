@@ -103,4 +103,86 @@ export class DynamodbService {
             this.logger.warn('Error while saving list to DynamoDB: ' + error);
         }
     }
+
+    /**
+     * Returns all tasks of a list from the database.
+     *
+     * @param partitionQuery {string} the partition key (list id) to query for
+     * @return {TodoElement[]} the task in the given list
+     */
+    async getTodosOfList(partitionQuery: string): Promise<TodoElement[]> {
+        this.logger.log('Querying all taks in the list' + partitionQuery);
+
+        const queryListsCommand = new QueryCommand({
+            KeyConditionExpression: '#partition = :partition',
+            ExpressionAttributeNames: {
+                '#partition': 'partition',
+            },
+            ExpressionAttributeValues: marshall({
+                ':partition': partitionQuery,
+            }),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        const lists: TodoElement[] = [];
+        try {
+            const dynamoTodoElementData = await this.dynamoDBClient.send(
+                queryListsCommand,
+            );
+            this.logger.log(
+                'Successfully loaded lists. (RequestID: ' +
+                    dynamoTodoElementData.$metadata.requestId +
+                    ', capacity_units:' +
+                    dynamoTodoElementData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+
+            dynamoTodoElementData.Items.forEach((item) => {
+                const listItem = unmarshall(item) as TodoElement;
+                lists.push(listItem);
+            });
+        } catch (error) {
+            this.logger.warn(
+                'Error while loading lists from DynamoDB: ' + error,
+            );
+        }
+
+        return lists;
+    }
+
+    /**
+     * Save a new task to the database.
+     *
+     * @param todoElement {TodoElement} the task to save
+     * @return {void}
+     */
+    async createTodoElementInList(todoElement: TodoElement): Promise<void> {
+        this.logger.log(
+            'Save' +
+                todoElement.partition +
+                ' | ' +
+                todoElement.sort +
+                ' to DynamoDB.',
+        );
+
+        const putListCommand = new PutItemCommand({
+            Item: marshall(todoElement),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        try {
+            const insertedData = await this.dynamoDBClient.send(putListCommand);
+            this.logger.log(
+                'Saved task to DynamoDB. (RequestID: ' +
+                    insertedData.$metadata.requestId +
+                    ', capacity_units:' +
+                    insertedData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+        } catch (error) {
+            this.logger.warn('Error while saving task to DynamoDB: ' + error);
+        }
+    }
 }

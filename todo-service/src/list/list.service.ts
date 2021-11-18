@@ -2,6 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DynamodbService } from '../dynamodb/dynamodb.service';
 import { TodoList } from '../types/TodoList.interface';
+import {
+    LIST_PARTITION_PREFIX,
+    USER_PARTITION_PREFIX,
+} from '../dynamodb/dynamodb.constants';
 
 /**
  * The Service to manage {@link TodoList}s.
@@ -9,9 +13,6 @@ import { TodoList } from '../types/TodoList.interface';
 @Injectable()
 export class ListService {
     private readonly logger = new Logger(ListService.name);
-
-    private readonly USER_PARTITION_PREFIX = 'USER#';
-    private readonly LIST_PARTITION_PREFIX = 'LIST#';
 
     constructor(private dynamodbService: DynamodbService) {}
 
@@ -24,7 +25,7 @@ export class ListService {
     async getLists(user: User): Promise<TodoList[]> {
         this.logger.log('Getting lists of user ' + user.sub);
         const lists = await this.dynamodbService.getListsOfUser(
-            this.USER_PARTITION_PREFIX + user.sub,
+            USER_PARTITION_PREFIX + user.sub,
         );
         this.logger.debug(
             'Returning ' + lists.length + ' lists for ' + user.sub,
@@ -48,8 +49,8 @@ export class ListService {
             'Creating new list' + listID + ' for user ' + user.sub + '',
         );
         const list: TodoList = {
-            partition: this.USER_PARTITION_PREFIX + user.sub,
-            sort: this.LIST_PARTITION_PREFIX + listID,
+            partition: USER_PARTITION_PREFIX + user.sub,
+            sort: LIST_PARTITION_PREFIX + listID,
             name: listInfo.name ?? 'New List',
             color: listInfo.color ?? 'warning',
             icon: listInfo.icon ?? 'check-circle-fill',

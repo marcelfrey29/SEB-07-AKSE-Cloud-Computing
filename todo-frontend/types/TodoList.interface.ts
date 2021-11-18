@@ -1,7 +1,8 @@
 export interface TodoList {
-    owner: string
-    id: string
+    partition: string
+    sort: string
     name: string
+    icon: string
     color: string
     icon: string
 }

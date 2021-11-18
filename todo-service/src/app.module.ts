@@ -6,6 +6,7 @@ import { AuthGuard, KeycloakConnectModule } from 'nest-keycloak-connect';
 import { APP_GUARD } from '@nestjs/core';
 import { ListModule } from './list/list.module';
 import { DynamodbModule } from './dynamodb/dynamodb.module';
+import { TodosModule } from './todos/todos.module';
 
 @Module({
     imports: [
@@ -28,6 +29,7 @@ import { DynamodbModule } from './dynamodb/dynamodb.module';
         }),
         ListModule,
         DynamodbModule,
+        TodosModule,
     ],
     controllers: [AppController],
     providers: [

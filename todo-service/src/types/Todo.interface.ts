@@ -1,11 +1,15 @@
+import { DynamoTableDefinition } from './DynamoTableDefinition';
+
 /**
+ * TodoElement represents one task.
  *
  */
-export interface Todo {
-    id: string;
+export interface TodoElement extends DynamoTableDefinition {
     title: string;
     description: string;
-    due_date: string;
+    dueDate: string;
     isFlagged: boolean;
     tags: string[];
+    isDone: boolean;
+    owner: string;
 }

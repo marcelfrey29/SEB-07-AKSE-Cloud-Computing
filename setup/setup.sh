@@ -61,6 +61,7 @@ printTask "To setup and run the application, following tools are required:"
 printRequiredInstallState "Docker" "docker"
 printRequiredInstallState "Docker Compose" "docker-compose"
 printRequiredInstallState "Terraform" "terraform"
+printRequiredInstallState "AWS CLI" "aws"
 printWait
 
 # Ports
@@ -68,6 +69,7 @@ printTask "The application requires following ports to be available on the host:
 printCheck "8080 (Keycloak)"
 printCheck "4000 (Todo-Service)"
 printCheck "3000 (Frontend)"
+printCheck "8000 (Todo-Database [DynamoDB])"
 print "Make sure there are no other applications running on these ports."
 printWait
 
@@ -135,6 +137,39 @@ printCheck "Now you should see a list of all clients. Open the 'todoservice' cli
 printCheck "On the top, select the tab 'credentials'."
 printCheck "Click 'Regenerate Secret', copy the secret and paste it here."
 todoServiceKeycloakSecret=$(askForValue "Secret")
+printWait
+
+# DynamoDB Setup
+printTask "Next, we have to setup the Todo-DB (DynamoDB)"
+print "On AWS, this is done with Terraform when the table is created."
+print "However, locally, this has to be done manually."
+printWait
+
+printTask "Make sure that the AWS CLI is configured correctly."
+print "To execute commands against dynamodb-local, the AWS CLI has to be configured with credentials."
+print "Those credentials don't need to be real!"
+printCheck "If you don't have credentials configured, run 'aws configure' in your other terminal window."
+printCheck "For 'AWS Key ID' and 'AWS Secret Access Key' type 'XXX' (yes, three 'X' is ok for dynamodb-local - it only can't be empty)"
+printCheck "For region select 'eu-central-1'"
+print "IMPORTANT: Only continue if the AWS CLI is configured!"
+printWait
+
+print "Currently, there are no tables:"
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+print "Creating Table..."
+aws dynamodb create-table --table-name Todos \
+      --attribute-definitions \
+          AttributeName=partition,AttributeType=S \
+          AttributeName=sort,AttributeType=S \
+      --key-schema \
+          AttributeName=partition,KeyType=HASH \
+          AttributeName=sort,KeyType=RANGE \
+      --provisioned-throughput \
+              ReadCapacityUnits=10,WriteCapacityUnits=5 \
+      --endpoint-url http://localhost:8000
+print "Table created:"
+aws dynamodb list-tables --endpoint-url http://localhost:8000
+printCheck "DynamoDB is ready! 🎉"
 printWait
 
 # Configure TodoService

@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { TodoList } from '../types/TodoList.interface';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { TodoElement } from '../types/Todo.interface';
 
 /**
  * The DynamoDbService is responsible for storing and retrieving data.
@@ -30,11 +31,11 @@ export class DynamodbService {
     /**
      * Return all lists from the database.
      *
-     * @param partitionQuery {string} the partition key to query for
+     * @param partitionQuery {string} the partition key (user id) to query for
      * @return {TodoList[]} the lists of the user
      */
     async getListsOfUser(partitionQuery: string): Promise<TodoList[]> {
-        this.logger.log('Querying all lists for ' + partitionQuery);
+        this.logger.log('Querying all lists for the user ' + partitionQuery);
 
         const queryListsCommand = new QueryCommand({
             KeyConditionExpression: '#partition = :partition',
@@ -78,6 +79,7 @@ export class DynamodbService {
      * Add a new List entry to the database.
      *
      * @param list {TodoList} the list object to save
+     * @return {void}
      */
     async createList(list: TodoList): Promise<void> {
         this.logger.log(

@@ -15,7 +15,7 @@ import { TodoList } from '../types/TodoList.interface';
  */
 @Controller('/lists')
 export class ListController {
-    private logger = new Logger(ListController.name);
+    private readonly logger = new Logger(ListController.name);
 
     constructor(private listService: ListService) {}
 
@@ -23,6 +23,7 @@ export class ListController {
      * Endpoint to get all lists.
      *
      * @param request {AuthorizedRequest} the request object with the user information
+     * @return {TodoList[]} all lists of the user
      */
     @Get()
     async getLists(@Request() request: AuthorizedRequest): Promise<TodoList[]> {
@@ -35,6 +36,7 @@ export class ListController {
      *
      * @param request {AuthorizedRequest} the request object with the user information
      * @param listInfo {Partial<TodoList>} information of the new list
+     * @return {TodoList[]} all lists of the user
      */
     @Post()
     async createTodo(

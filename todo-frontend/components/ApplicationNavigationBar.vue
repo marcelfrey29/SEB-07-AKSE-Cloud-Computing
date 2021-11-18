@@ -3,7 +3,11 @@
         <!-- Home -->
         <b-card-title>General</b-card-title>
         <div>
-            <NuxtLink to="/dashboard">
+            <NuxtLink
+                to="/dashboard"
+                active-class="selected-list"
+                class="list-link"
+            >
                 <BIconGridFill></BIconGridFill>
                 Dashboard
             </NuxtLink>
@@ -19,8 +23,12 @@
         </b-card-sub-title>
 
         <div v-for="(list, index) in todoLists" :key="'list-' + index">
-            <NuxtLink :to="'/list/' + list.name">
-                <BIcon :icon="list.icon"></BIcon>
+            <NuxtLink
+                :to="'/lists/' + list.sort.split('#')[1]"
+                active-class="selected-list"
+                class="list-link"
+            >
+                <BIcon :icon="list.icon" :variant="list.color"></BIcon>
                 {{ list.name }}
             </NuxtLink>
         </div>
@@ -118,13 +126,21 @@
         <!-- More -->
         <b-card-title>More</b-card-title>
         <div>
-            <NuxtLink to="/account">
+            <NuxtLink
+                to="/account"
+                active-class="selected-list"
+                class="list-link"
+            >
                 <BIconPersonCircle></BIconPersonCircle>
                 Account
             </NuxtLink>
         </div>
         <div>
-            <NuxtLink to="/settings">
+            <NuxtLink
+                to="/settings"
+                active-class="selected-list"
+                class="list-link"
+            >
                 <BIconGearFill></BIconGearFill>
                 Settings
             </NuxtLink>
@@ -136,6 +152,7 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 import {
+    BIcon,
     BIconGearFill,
     BIconGridFill,
     BIconPersonCircle,
@@ -151,6 +168,7 @@ import { TodoList } from '~/types/TodoList.interface'
  */
 @Component({
     components: {
+        BIcon,
         BIconGearFill,
         BIconGridFill,
         BIconPersonCircle,
@@ -196,4 +214,26 @@ export default class ApplicationNavigationBar extends Vue {
 }
 </script>
 
-<style></style>
+<style>
+a {
+    color: black;
+}
+
+a:hover {
+    text-decoration: none;
+    color: dodgerblue;
+}
+
+.selected-list {
+    font-weight: bold;
+    background-color: #dddddd !important;
+}
+
+.list-link {
+    background-color: #eeeeee;
+    border-radius: 5px;
+    display: block;
+    margin: 5px 0;
+    padding: 5px;
+}
+</style>

@@ -1,13 +1,14 @@
-import { Todo } from './Todo.interface';
+import { DynamoTableDefinition } from './DynamoTableDefinition';
 
 /**
- * TodoList is a collection of Todos.
+ * TodoList describes a collection of Todos.
+ *
+ * @property name {string} the name of the list
+ * @property icon {string} the icon of the list
+ * @property color {string} the color of the list
  */
-export interface TodoList {
-    owner: string;
-    id: string;
+export interface TodoList extends DynamoTableDefinition {
     name: string;
     icon: string;
     color: string;
-    todos: Todo[];
 }

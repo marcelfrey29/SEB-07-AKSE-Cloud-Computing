@@ -4,7 +4,7 @@
             <b-row>
                 <b-col cols="1" class="p-0">
                     <b-checkbox
-                        v-model="todoData.isDone"
+                        :checked="todoData.isDone"
                         @change="$emit('toggle-todo', todoData)"
                     ></b-checkbox>
                 </b-col>

@@ -49,8 +49,8 @@ export class ListService {
             'Creating new list' + listID + ' for user ' + user.sub + '',
         );
         const list: TodoList = {
-            partition: USER_PARTITION_PREFIX + user.sub,
-            sort: LIST_PARTITION_PREFIX + listID,
+            partitionKey: USER_PARTITION_PREFIX + user.sub,
+            sortKey: LIST_PARTITION_PREFIX + listID,
             name: listInfo.name ?? 'New List',
             color: listInfo.color ?? 'warning',
             icon: listInfo.icon ?? 'check-circle-fill',

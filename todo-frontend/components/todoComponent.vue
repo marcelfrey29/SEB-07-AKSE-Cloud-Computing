@@ -32,7 +32,7 @@
                     <div>
                         <b-badge
                             v-for="tag in todoData.tags"
-                            :key="'list-' + todoData.sort + 'tag-' + tag"
+                            :key="'list-' + todoData.sortKey + 'tag-' + tag"
                             pill
                             variant="secondary"
                             class="mr-2"
@@ -44,7 +44,7 @@
                 <b-col cols="1" class="p-0">
                     <div class="d-flex w-100 justify-content-center mt-1">
                         <b-dropdown
-                            :id="'menu-' + todoData.sort"
+                            :id="'menu-' + todoData.sortKey"
                             variant="none"
                             no-caret
                             right

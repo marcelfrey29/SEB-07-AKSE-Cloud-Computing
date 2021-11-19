@@ -24,7 +24,7 @@
 
         <div v-for="(list, index) in todoLists" :key="'list-' + index">
             <NuxtLink
-                :to="'/lists/' + list.sort.split('#')[1]"
+                :to="'/lists/' + list.sortKey.split('#')[1]"
                 active-class="selected-list"
                 class="list-link"
             >

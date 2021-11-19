@@ -65,8 +65,8 @@ export class TodosService {
                 user.sub,
         );
         const todoElement: TodoElement = {
-            partition: LIST_PARTITION_PREFIX + list,
-            sort: TODO_PARTITION_PREFIX + todoId,
+            partitionKey: LIST_PARTITION_PREFIX + list,
+            sortKey: TODO_PARTITION_PREFIX + todoId,
             title: todoData.title ?? '',
             description: todoData.description ?? '',
             dueDate: todoData.dueDate ?? '',
@@ -112,7 +112,7 @@ export class TodosService {
                 'User mismatch: ' +
                     user.sub +
                     ' is not the owner of todo ' +
-                    existingTodo.sort +
+                    existingTodo.sortKey +
                     '. (' +
                     existingTodo.owner +
                     ' is the correct owner!',
@@ -121,8 +121,8 @@ export class TodosService {
         }
 
         const todoElement: TodoElement = {
-            partition: LIST_PARTITION_PREFIX + list,
-            sort: TODO_PARTITION_PREFIX + task,
+            partitionKey: LIST_PARTITION_PREFIX + list,
+            sortKey: TODO_PARTITION_PREFIX + task,
             title: todoData.title ?? '',
             description: todoData.description ?? '',
             dueDate: todoData.dueDate ?? '',

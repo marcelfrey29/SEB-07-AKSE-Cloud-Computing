@@ -129,8 +129,8 @@ export default class TodoEditor extends Vue {
             }
         } else if (this.type === 'EDIT') {
             todoData = {
-                partition: this.existingData.partition,
-                sort: this.existingData.sort,
+                partitionKey: this.existingData.partitionKey,
+                sortKey: this.existingData.sortKey,
                 title: this.newTodoTitle,
                 description: this.newTodoDescription,
                 dueDate: this.newTodoDate,

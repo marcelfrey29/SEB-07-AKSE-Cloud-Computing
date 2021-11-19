@@ -159,11 +159,11 @@ aws dynamodb list-tables --endpoint-url http://localhost:8000
 print "Creating Table..."
 aws dynamodb create-table --table-name Todos \
       --attribute-definitions \
-          AttributeName=partition,AttributeType=S \
-          AttributeName=sort,AttributeType=S \
+          AttributeName=partitionKey,AttributeType=S \
+          AttributeName=sortKey,AttributeType=S \
       --key-schema \
-          AttributeName=partition,KeyType=HASH \
-          AttributeName=sort,KeyType=RANGE \
+          AttributeName=partitionKey,KeyType=HASH \
+          AttributeName=sortKey,KeyType=RANGE \
       --provisioned-throughput \
               ReadCapacityUnits=10,WriteCapacityUnits=5 \
       --endpoint-url http://localhost:8000

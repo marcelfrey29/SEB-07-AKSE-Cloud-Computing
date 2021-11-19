@@ -2,8 +2,8 @@
  *
  */
 export interface Todo {
-    partition: string
-    sort: string
+    partitionKey: string
+    sortKey: string
     title: string
     description: string
     dueDate: string

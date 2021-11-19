@@ -3,7 +3,7 @@
         <b-container fluid>
             <b-row>
                 <b-col class="p-0">
-                    <div v-for="todo in todos" :key="'todo-' + todo.sort">
+                    <div v-for="todo in todos" :key="'todo-' + todo.sortKey">
                         <TodoComponent
                             :todo-data="todo"
                             @send-todo="editTodo($event)"
@@ -81,7 +81,7 @@ export default class List extends Vue {
                     '/list/' +
                     this.listId +
                     '/todo/' +
-                    todoData.sort?.split('#')[1],
+                    todoData.sortKey?.split('#')[1],
                 todoData
             )
         } catch (error) {}
@@ -95,7 +95,7 @@ export default class List extends Vue {
                     '/list/' +
                     this.listId +
                     '/todo/' +
-                    todoData.sort?.split('#')[1],
+                    todoData.sortKey?.split('#')[1],
                 todoData
             )
         } catch (error) {}

@@ -32,19 +32,19 @@ export class DynamodbService {
     /**
      * Return all lists from the database.
      *
-     * @param partitionQuery {string} the partition key (user id) to query for
+     * @param partitionQuery {string} the partition-key (user id) to query for
      * @return {TodoList[]} the lists of the user
      */
     async getListsOfUser(partitionQuery: string): Promise<TodoList[]> {
         this.logger.log('Querying all lists for the user ' + partitionQuery);
 
         const queryListsCommand = new QueryCommand({
-            KeyConditionExpression: '#partition = :partition',
+            KeyConditionExpression: '#partitionKey = :partitionKey',
             ExpressionAttributeNames: {
-                '#partition': 'partition',
+                '#partitionKey': 'partitionKey',
             },
             ExpressionAttributeValues: marshall({
-                ':partition': partitionQuery,
+                ':partitionKey': partitionQuery,
             }),
             TableName: this.TABLE_NAME,
             ReturnConsumedCapacity: 'TOTAL',
@@ -84,7 +84,7 @@ export class DynamodbService {
      */
     async createList(list: TodoList): Promise<void> {
         this.logger.log(
-            'Save' + list.partition + ' | ' + list.sort + ' to DynamoDB.',
+            'Save' + list.partitionKey + ' | ' + list.sortKey + ' to DynamoDB.',
         );
 
         const putListCommand = new PutItemCommand({
@@ -110,19 +110,19 @@ export class DynamodbService {
     /**
      * Returns all tasks of a list from the database.
      *
-     * @param partitionQuery {string} the partition key (list id) to query for
+     * @param partitionQuery {string} the partition-key (list id) to query for
      * @return {TodoElement[]} the task in the given list
      */
     async getTodosOfList(partitionQuery: string): Promise<TodoElement[]> {
-        this.logger.log('Querying all taks in the list' + partitionQuery);
+        this.logger.log('Querying all tasks in the list' + partitionQuery);
 
         const queryListsCommand = new QueryCommand({
-            KeyConditionExpression: '#partition = :partition',
+            KeyConditionExpression: '#partitionKey = :partitionKey',
             ExpressionAttributeNames: {
-                '#partition': 'partition',
+                '#partitionKey': 'partitionKey',
             },
             ExpressionAttributeValues: marshall({
-                ':partition': partitionQuery,
+                ':partitionKey': partitionQuery,
             }),
             TableName: this.TABLE_NAME,
             ReturnConsumedCapacity: 'TOTAL',
@@ -163,9 +163,9 @@ export class DynamodbService {
     async createTodoElementInList(todoElement: TodoElement): Promise<void> {
         this.logger.log(
             'Save' +
-                todoElement.partition +
+                todoElement.partitionKey +
                 ' | ' +
-                todoElement.sort +
+                todoElement.sortKey +
                 ' to DynamoDB.',
         );
 
@@ -198,16 +198,16 @@ export class DynamodbService {
     async updateTodoElement(todoElement: TodoElement): Promise<void> {
         this.logger.log(
             'Update todo' +
-                todoElement.sort +
+                todoElement.sortKey +
                 ' of list ' +
-                todoElement.partition +
+                todoElement.partitionKey +
                 ' in DynamoDB.',
         );
 
         const updateTodoCommand = new UpdateItemCommand({
             Key: marshall({
-                partition: todoElement.partition,
-                sort: todoElement.sort,
+                partitionKey: todoElement.partitionKey,
+                sortKey: todoElement.sortKey,
             }),
             UpdateExpression:
                 'set title = :title, description = :description, dueDate = :dueDate, isFlagged = :isFlagged, tags = :tags, isDone = :isDone',
@@ -253,14 +253,15 @@ export class DynamodbService {
         this.logger.log('Load todo ' + sortKey + ' of list ' + partitionKey);
 
         const queryTodoCommand = new QueryCommand({
-            KeyConditionExpression: '#partition = :partition AND #sort = :sort',
+            KeyConditionExpression:
+                '#partitionKey = :partitionKey AND #sortKey = :sortKey',
             ExpressionAttributeNames: {
-                '#partition': 'partition',
-                '#sort': 'sort',
+                '#partitionKey': 'partitionKey',
+                '#sortKey': 'sortKey',
             },
             ExpressionAttributeValues: marshall({
-                ':partition': partitionKey,
-                ':sort': sortKey,
+                ':partitionKey': partitionKey,
+                ':sortKey': sortKey,
             }),
             TableName: this.TABLE_NAME,
             ReturnConsumedCapacity: 'TOTAL',

@@ -41,8 +41,10 @@
                             </template>
 
                             <!-- Dropdown -->
-                            <b-dropdown-item>Edit</b-dropdown-item>
+                            <b-dropdown-item @click="$refs['inline-editor'].$refs['create-todo-modal'].show()">Edit</b-dropdown-item>
                             <b-dropdown-item>Delete</b-dropdown-item>
+
+                            <TodoEditor ref="inline-editor" type="EDIT" :existing-data="todoData" @send-todo="$emit('send-todo',$event)"></TodoEditor>
                         </b-dropdown>
                     </div>
                     <div class="d-flex w-100 justify-content-center mt-4">
@@ -63,12 +65,14 @@ import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
 import { BIconFlagFill, BIconThreeDotsVertical } from 'bootstrap-vue'
 import { Todo } from '~/types/Todo.interface'
+import TodoEditor from "~/components/TodoEditor.vue";
 
 /**
  * The footer of the application.
  */
 @Component({
     components: {
+        TodoEditor,
         BIconFlagFill,
         BIconThreeDotsVertical,
     },

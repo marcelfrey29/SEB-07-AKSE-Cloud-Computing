@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
+    DeleteItemCommand,
     DynamoDBClient,
     PutItemCommand,
     QueryCommand,
@@ -236,6 +237,52 @@ export class DynamodbService {
             );
         } catch (error) {
             this.logger.warn('Error while updating task in DynamoDB: ' + error);
+        }
+    }
+
+    /**
+     * Delete a task from a list.
+     *
+     * @param todoElement {Partial<TodoElement>} the element to delete
+     * @return {void}
+     */
+    async deleteTodoElement(todoElement: Partial<TodoElement>): Promise<void> {
+        this.logger.log(
+            'Delete todo' +
+                todoElement.sortKey +
+                ' from list ' +
+                todoElement.partitionKey +
+                ' in DynamoDB.',
+        );
+
+        const deleteTodoCommand = new DeleteItemCommand({
+            Key: marshall({
+                partitionKey: todoElement.partitionKey,
+                sortKey: todoElement.sortKey,
+            }),
+            ConditionExpression:
+                'partitionKey = :partitionKey AND sortKey = :sortKey',
+            ExpressionAttributeValues: marshall({
+                ':partitionKey': todoElement.partitionKey,
+                ':sortKey': todoElement.sortKey,
+            }),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        try {
+            const insertedData = await this.dynamoDBClient.send(
+                deleteTodoCommand,
+            );
+            this.logger.log(
+                'Deleted task from DynamoDB. (RequestID: ' +
+                    insertedData.$metadata.requestId +
+                    ', capacity_units: ' +
+                    insertedData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+        } catch (error) {
+            this.logger.warn('Error while deleting task in DynamoDB: ' + error);
         }
     }
 

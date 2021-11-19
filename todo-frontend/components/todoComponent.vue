@@ -65,7 +65,10 @@
                                 "
                                 >Edit</b-dropdown-item
                             >
-                            <b-dropdown-item>Delete</b-dropdown-item>
+                            <b-dropdown-item
+                                @click="$refs['delete-modal'].show()"
+                                >Delete</b-dropdown-item
+                            >
 
                             <TodoEditor
                                 ref="inline-editor"
@@ -73,6 +76,30 @@
                                 :existing-data="todoData"
                                 @send-todo="$emit('send-todo', $event)"
                             ></TodoEditor>
+
+                            <b-modal
+                                ref="delete-modal"
+                                centered
+                                title="Delete the Todo"
+                                @ok="$emit('delete-todo', todoData)"
+                            >
+                                <p class="m-0">
+                                    Are you sure that you want to delete the
+                                    todo?
+                                </p>
+
+                                <template #modal-footer="{ ok, cancel }">
+                                    <b-button
+                                        variant="outline-secondary"
+                                        @click="cancel()"
+                                    >
+                                        Cancel
+                                    </b-button>
+                                    <b-button variant="danger" @click="ok()">
+                                        Delete
+                                    </b-button>
+                                </template>
+                            </b-modal>
                         </b-dropdown>
                     </div>
                     <div class="d-flex w-100 justify-content-center mt-4">

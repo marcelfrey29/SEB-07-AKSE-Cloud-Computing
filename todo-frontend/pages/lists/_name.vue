@@ -8,6 +8,7 @@
                             :todo-data="todo"
                             @send-todo="editTodo($event)"
                             @toggle-todo="toggleTodo($event)"
+                            @delete-todo="deleteTodo($event)"
                         ></TodoComponent>
                     </div>
                 </b-col>
@@ -97,6 +98,18 @@ export default class List extends Vue {
                     '/todo/' +
                     todoData.sortKey?.split('#')[1],
                 todoData
+            )
+        } catch (error) {}
+    }
+
+    async deleteTodo(todoData: Partial<Todo>): Promise<void> {
+        try {
+            this.todos = await this.$axios.$delete(
+                this.BASE_URL +
+                    '/list/' +
+                    this.listId +
+                    '/todo/' +
+                    todoData.sortKey?.split('#')[1]
             )
         } catch (error) {}
     }

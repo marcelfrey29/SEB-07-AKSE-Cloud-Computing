@@ -134,4 +134,47 @@ export class TodosService {
         await this.dynamodbService.updateTodoElement(todoElement);
         return await this.getTodos(user, list);
     }
+
+    /**
+     * Delete an existing task.
+     *
+     * @param user {User} the user
+     * @param list {string} the unique id of the list where the task belongs to
+     * @param task {string} the unique id of the task to delete
+     * @return {TodoElement[]} returns all remaining task in the list
+     */
+    async deleteTodo(user: User, list: string, task: string) {
+        this.logger.log(
+            'Delete the todo ' +
+                task +
+                ' in list ' +
+                list +
+                ' for user ' +
+                user.sub,
+        );
+        const existingTodo: TodoElement =
+            await this.dynamodbService.getTodoById(
+                LIST_PARTITION_PREFIX + list,
+                TODO_PARTITION_PREFIX + task,
+            );
+        if (existingTodo.owner !== user.sub) {
+            this.logger.warn(
+                'User mismatch: ' +
+                    user.sub +
+                    ' is not the owner of todo ' +
+                    existingTodo.sortKey +
+                    '. (' +
+                    existingTodo.owner +
+                    ' is the correct owner!',
+            );
+            throw new Error('User Mismatch');
+        }
+
+        const todoElement: Partial<TodoElement> = {
+            partitionKey: LIST_PARTITION_PREFIX + list,
+            sortKey: TODO_PARTITION_PREFIX + task,
+        };
+        await this.dynamodbService.deleteTodoElement(todoElement);
+        return await this.getTodos(user, list);
+    }
 }

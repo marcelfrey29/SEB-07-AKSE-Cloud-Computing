@@ -7,6 +7,7 @@
                         <TodoComponent
                             :todo-data="todo"
                             @send-todo="editTodo($event)"
+                            @toggle-todo="toggleTodo($event)"
                         ></TodoComponent>
                     </div>
                 </b-col>
@@ -74,6 +75,20 @@ export default class List extends Vue {
     }
 
     async editTodo(todoData: Partial<Todo>): Promise<void> {
+        try {
+            this.todos = await this.$axios.$put(
+                this.BASE_URL +
+                    '/list/' +
+                    this.listId +
+                    '/todo/' +
+                    todoData.sort?.split('#')[1],
+                todoData
+            )
+        } catch (error) {}
+    }
+
+    async toggleTodo(todoData: Partial<Todo>): Promise<void> {
+        todoData.isDone = !todoData.isDone
         try {
             this.todos = await this.$axios.$put(
                 this.BASE_URL +

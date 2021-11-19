@@ -3,7 +3,10 @@
         <b-container>
             <b-row>
                 <b-col cols="1" class="p-0">
-                    <b-checkbox v-model="todoData.isDone"></b-checkbox>
+                    <b-checkbox
+                        v-model="todoData.isDone"
+                        @change="$emit('toggle-todo', todoData)"
+                    ></b-checkbox>
                 </b-col>
                 <b-col class="p-0">
                     <b-card-title>

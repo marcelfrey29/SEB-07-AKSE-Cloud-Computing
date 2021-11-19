@@ -128,7 +128,7 @@ export class TodosService {
             dueDate: todoData.dueDate ?? '',
             isFlagged: todoData.isFlagged ?? false,
             tags: todoData.tags ?? [],
-            isDone: false,
+            isDone: todoData.isDone ?? false,
             owner: user.sub,
         };
         await this.dynamodbService.updateTodoElement(todoElement);

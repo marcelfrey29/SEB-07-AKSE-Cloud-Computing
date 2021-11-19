@@ -4,7 +4,10 @@
             <b-row>
                 <b-col class="p-0">
                     <div v-for="todo in todos" :key="'todo-' + todo.sort">
-                        <TodoComponent :todo-data="todo" @send-todo="editTodo($event)"></TodoComponent>
+                        <TodoComponent
+                            :todo-data="todo"
+                            @send-todo="editTodo($event)"
+                        ></TodoComponent>
                     </div>
                 </b-col>
             </b-row>
@@ -13,12 +16,20 @@
                     <b-button
                         variant="primary"
                         class="mt-2"
-                        @click="$refs['inline-editor'].$refs['create-todo-modal'].show()"
+                        @click="
+                            $refs['inline-editor'].$refs[
+                                'create-todo-modal'
+                            ].show()
+                        "
                         >Create Todo</b-button
                     >
 
                     <!-- Create List Popup -->
-                    <TodoEditor ref="inline-editor" type="CREATE" @send-todo="createTodo($event)"></TodoEditor>
+                    <TodoEditor
+                        ref="inline-editor"
+                        type="CREATE"
+                        @send-todo="createTodo($event)"
+                    ></TodoEditor>
                 </b-col>
             </b-row>
         </b-container>
@@ -30,10 +41,10 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import { Todo } from '~/types/Todo.interface'
 import TodoComponent from '~/components/todoComponent.vue'
-import TodoEditor from "~/components/TodoEditor.vue";
+import TodoEditor from '~/components/TodoEditor.vue'
 
 @Component({
-    components: {TodoEditor, TodoComponent },
+    components: { TodoEditor, TodoComponent },
 })
 export default class List extends Vue {
     private listId = ''
@@ -64,8 +75,12 @@ export default class List extends Vue {
 
     async editTodo(todoData: Partial<Todo>): Promise<void> {
         try {
-            this.todos = await this.$axios.$post(
-                this.BASE_URL + '/todos/' + this.listId + '/' + todoData.sort,
+            this.todos = await this.$axios.$put(
+                this.BASE_URL +
+                    '/list/' +
+                    this.listId +
+                    '/todo/' +
+                    todoData.sort?.split('#')[1],
                 todoData
             )
         } catch (error) {}

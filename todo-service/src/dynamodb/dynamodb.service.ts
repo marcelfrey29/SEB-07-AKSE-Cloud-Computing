@@ -3,6 +3,7 @@ import {
     DynamoDBClient,
     PutItemCommand,
     QueryCommand,
+    UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { ConfigService } from '@nestjs/config';
 import { TodoList } from '../types/TodoList.interface';
@@ -186,5 +187,109 @@ export class DynamodbService {
         } catch (error) {
             this.logger.warn('Error while saving task to DynamoDB: ' + error);
         }
+    }
+
+    /**
+     * Update an existing task.
+     *
+     * @param todoElement {TodoElement} the element to update
+     * @return {void}
+     */
+    async updateTodoElement(todoElement: TodoElement): Promise<void> {
+        this.logger.log(
+            'Update todo' +
+                todoElement.sort +
+                ' of list ' +
+                todoElement.partition +
+                ' in DynamoDB.',
+        );
+
+        const updateTodoCommand = new UpdateItemCommand({
+            Key: marshall({
+                partition: todoElement.partition,
+                sort: todoElement.sort,
+            }),
+            UpdateExpression:
+                'set title = :title, description = :description, dueDate = :dueDate, isFlagged = :isFlagged, tags = :tags, isDone = :isDone',
+            ExpressionAttributeValues: marshall({
+                ':title': todoElement.title,
+                ':description': todoElement.description,
+                ':dueDate': todoElement.dueDate,
+                ':isFlagged': todoElement.isFlagged,
+                ':tags': todoElement.tags,
+                ':isDone': todoElement.isDone,
+            }),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        try {
+            const insertedData = await this.dynamoDBClient.send(
+                updateTodoCommand,
+            );
+            this.logger.log(
+                'Updated task in DynamoDB. (RequestID: ' +
+                    insertedData.$metadata.requestId +
+                    ', capacity_units: ' +
+                    insertedData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+        } catch (error) {
+            this.logger.warn('Error while updating task in DynamoDB: ' + error);
+        }
+    }
+
+    /**
+     * Return a task in a list.
+     *
+     * @param partitionKey {string} the unique id of the list
+     * @param sortKey {string} the unique id of the todo
+     * @return {TodoElement} returns the task with the given id
+     */
+    async getTodoById(
+        partitionKey: string,
+        sortKey: string,
+    ): Promise<TodoElement> {
+        this.logger.log('Load todo ' + sortKey + ' of list ' + partitionKey);
+
+        const queryTodoCommand = new QueryCommand({
+            KeyConditionExpression: '#partition = :partition AND #sort = :sort',
+            ExpressionAttributeNames: {
+                '#partition': 'partition',
+                '#sort': 'sort',
+            },
+            ExpressionAttributeValues: marshall({
+                ':partition': partitionKey,
+                ':sort': sortKey,
+            }),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        try {
+            const dynamoTodoData = await this.dynamoDBClient.send(
+                queryTodoCommand,
+            );
+            this.logger.log(
+                'Successfully loaded todo. (RequestID: ' +
+                    dynamoTodoData.$metadata.requestId +
+                    ', capacity_units: ' +
+                    dynamoTodoData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+
+            if (dynamoTodoData.Items.length > 1) {
+                this.logger.error(
+                    'Queried for exact one todo, but received more than one!',
+                );
+            }
+
+            return unmarshall(dynamoTodoData.Items[0]) as TodoElement;
+        } catch (error) {
+            this.logger.warn(
+                'Error while loading lists from DynamoDB: ' + error,
+            );
+        }
+        throw new Error('Query error or too many todos.');
     }
 }

@@ -33,7 +33,11 @@
                     id="todo-desc"
                     v-model="newTodoDescription"
                     type="text"
-                    :placeholder="type === 'CREATE' ? 'Get some new coffee to stay productive.' : ' '"
+                    :placeholder="
+                        type === 'CREATE'
+                            ? 'Get some new coffee to stay productive.'
+                            : ' '
+                    "
                     required
                 ></b-form-input>
             </b-form-group>
@@ -82,10 +86,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
-import {Todo} from "~/types/Todo.interface";
+import Vue from 'vue'
+import Component from 'vue-class-component'
+import { Prop, Watch } from 'vue-property-decorator'
+import { Todo } from '~/types/Todo.interface'
 
 @Component({})
 export default class TodoEditor extends Vue {
@@ -98,23 +102,47 @@ export default class TodoEditor extends Vue {
 
     // Properties
     @Prop()
-    type!: "CREATE" | "EDIT"
+    type!: 'CREATE' | 'EDIT'
 
     @Prop()
     existingData!: Todo
+
+    @Watch('existingData')
+    see() {
+        this.cancelAction()
+    }
 
     mounted(): void {
         this.cancelAction()
     }
 
     createTodo(): void {
-        const todoData: Partial<Todo> = {
-            title: this.newTodoTitle,
-            description: this.newTodoDescription,
-            dueDate: this.newTodoDate,
-            isFlagged: this.newTodoFlag,
-            tags: this.newTodoTags,
-            isDone: false,
+        let todoData: Todo | Partial<Todo>
+        if (this.type === 'CREATE') {
+            todoData = {
+                title: this.newTodoTitle,
+                description: this.newTodoDescription,
+                dueDate: this.newTodoDate,
+                isFlagged: this.newTodoFlag,
+                tags: this.newTodoTags,
+                isDone: false,
+            }
+        } else if (this.type === 'EDIT') {
+            todoData = {
+                partition: this.existingData.partition,
+                sort: this.existingData.sort,
+                title: this.newTodoTitle,
+                description: this.newTodoDescription,
+                dueDate: this.newTodoDate,
+                isFlagged: this.newTodoFlag,
+                tags: this.newTodoTags,
+                isDone: false,
+                owner: this.existingData.owner,
+            }
+        } else {
+            // eslint-disable-next-line no-console
+            console.error('Undefined Type: ' + this.type)
+            todoData = {}
         }
 
         this.$emit('send-todo', todoData)
@@ -124,14 +152,14 @@ export default class TodoEditor extends Vue {
     }
 
     cancelAction(): void {
-        if (this.type === "CREATE") {
+        if (this.type === 'CREATE') {
             // Reset Dialog for create state: Everything empty
             this.newTodoTitle = ''
             this.newTodoDescription = ''
             this.newTodoDate = ''
             this.newTodoTags = []
             this.newTodoFlag = false
-        } else if (this.type === "EDIT") {
+        } else if (this.type === 'EDIT') {
             if (this.existingData) {
                 // Reset Dialog for edit state: Reset to current values
                 this.newTodoTitle = this.existingData.title
@@ -142,12 +170,10 @@ export default class TodoEditor extends Vue {
             }
         } else {
             // eslint-disable-next-line no-console
-            console.error("Undefined Type: " + this.type)
+            console.error('Undefined Type: ' + this.type)
         }
     }
 }
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

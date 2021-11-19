@@ -12,7 +12,20 @@
                     <b-card-sub-title>
                         {{ todoData.description }}
                     </b-card-sub-title>
-                    <p class="mb-0">Due: {{ todoData.dueDate }}</p>
+                    <p
+                        v-if="todoData.dueDate && todoData.dueDate.length >= 2"
+                        class="mb-0"
+                    >
+                        Scheduled for:
+                        {{
+                            new Intl.DateTimeFormat('de', {
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            }).format(new Date(todoData.dueDate))
+                        }}
+                    </p>
                     <div>
                         <b-badge
                             v-for="tag in todoData.tags"
@@ -41,10 +54,22 @@
                             </template>
 
                             <!-- Dropdown -->
-                            <b-dropdown-item @click="$refs['inline-editor'].$refs['create-todo-modal'].show()">Edit</b-dropdown-item>
+                            <b-dropdown-item
+                                @click="
+                                    $refs['inline-editor'].$refs[
+                                        'create-todo-modal'
+                                    ].show()
+                                "
+                                >Edit</b-dropdown-item
+                            >
                             <b-dropdown-item>Delete</b-dropdown-item>
 
-                            <TodoEditor ref="inline-editor" type="EDIT" :existing-data="todoData" @send-todo="$emit('send-todo',$event)"></TodoEditor>
+                            <TodoEditor
+                                ref="inline-editor"
+                                type="EDIT"
+                                :existing-data="todoData"
+                                @send-todo="$emit('send-todo', $event)"
+                            ></TodoEditor>
                         </b-dropdown>
                     </div>
                     <div class="d-flex w-100 justify-content-center mt-4">
@@ -65,7 +90,7 @@ import Component from 'vue-class-component'
 import { Prop } from 'vue-property-decorator'
 import { BIconFlagFill, BIconThreeDotsVertical } from 'bootstrap-vue'
 import { Todo } from '~/types/Todo.interface'
-import TodoEditor from "~/components/TodoEditor.vue";
+import TodoEditor from '~/components/TodoEditor.vue'
 
 /**
  * The footer of the application.

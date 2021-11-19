@@ -10,4 +10,5 @@ export interface Todo {
     isFlagged: boolean
     tags: string[]
     isDone: boolean
+    owner: string
 }

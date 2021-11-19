@@ -78,4 +78,60 @@ export class TodosService {
         await this.dynamodbService.createTodoElementInList(todoElement);
         return await this.getTodos(user, list);
     }
+
+    /**
+     * Update an existing task.
+     *
+     * @param user {User} the user
+     * @param list {string} the unique id of the list where the task belongs to
+     * @param task {string} the unique id of the task to update
+     * @param todoData {Partial<TodoElement>} the new data to update the task with
+     * @return {TodoElement[]} returns all task in the list, including the updated one
+     */
+    async editTodo(
+        user: User,
+        list: string,
+        task: string,
+        todoData: Partial<TodoElement>,
+    ): Promise<TodoElement[]> {
+        this.logger.log(
+            'Updating the todo ' +
+                task +
+                ' in list ' +
+                list +
+                ' for user ' +
+                user.sub,
+        );
+        const existingTodo: TodoElement =
+            await this.dynamodbService.getTodoById(
+                LIST_PARTITION_PREFIX + list,
+                TODO_PARTITION_PREFIX + task,
+            );
+        if (existingTodo.owner !== user.sub) {
+            this.logger.warn(
+                'User mismatch: ' +
+                    user.sub +
+                    ' is not the owner of todo ' +
+                    existingTodo.sort +
+                    '. (' +
+                    existingTodo.owner +
+                    ' is the correct owner!',
+            );
+            throw new Error('User Mismatch');
+        }
+
+        const todoElement: TodoElement = {
+            partition: LIST_PARTITION_PREFIX + list,
+            sort: TODO_PARTITION_PREFIX + task,
+            title: todoData.title ?? '',
+            description: todoData.description ?? '',
+            dueDate: todoData.dueDate ?? '',
+            isFlagged: todoData.isFlagged ?? false,
+            tags: todoData.tags ?? [],
+            isDone: false,
+            owner: user.sub,
+        };
+        await this.dynamodbService.updateTodoElement(todoElement);
+        return await this.getTodos(user, list);
+    }
 }

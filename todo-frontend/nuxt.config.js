@@ -102,8 +102,8 @@ export default {
             },
         },
         redirect: {
-            login: '/about',
-            logout: '/about',
+            login: '/',
+            logout: '/',
             home: false,
         },
     },

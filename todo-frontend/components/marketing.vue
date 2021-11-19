@@ -37,10 +37,8 @@
 import Vue from 'vue'
 import Component from 'vue-class-component'
 
-@Component({
-    layout: 'about',
-})
-export default class About extends Vue {
+@Component({})
+export default class Marketing extends Vue {
     async login(): Promise<void> {
         await this.$auth.loginWith('keycloak')
     }

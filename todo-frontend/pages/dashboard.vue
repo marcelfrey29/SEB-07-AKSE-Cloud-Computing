@@ -29,7 +29,7 @@ export default class Dashboard extends Vue {
     async getServiceResponse(): Promise<void> {
         let response = ''
         try {
-            response = await this.$axios.$get('http://localhost:4000/priv')
+            response = await this.$axios.$get('http://localhost:4000/lists')
         } catch (err) {
             response = 'ERROR: ' + err
         }

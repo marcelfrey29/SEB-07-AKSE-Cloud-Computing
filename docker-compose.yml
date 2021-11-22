@@ -50,6 +50,18 @@ services:
       - "HOST=0.0.0.0"
     restart: unless-stopped
 
+  todo-db:
+    image: "amazon/dynamodb-local:1.17.0"
+    container_name: "todo-db"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+    volumes:
+      - "./.storage/todo-db/data:/home/dynamodblocal/data"
+    ports:
+      - "8000:8000" # TODO: For local development, until the keycloak bug (#5) is fixed
+    networks:
+      - backend
+    restart: unless-stopped
+
   todo-service:
     build: "./todo-service"
     container_name: todo-service
@@ -60,6 +72,8 @@ services:
     networks:
       - backend
       - keycloak
+    depends_on:
+      - todo-db
     restart: unless-stopped
 
 networks:

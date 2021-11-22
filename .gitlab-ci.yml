@@ -22,7 +22,7 @@ variables:
 
 .frontend-base:
   extends: .base
-  image: "node:16-alpine"
+  image: "node:16.13.0-alpine"
   # Cache only works for directories inside the project!
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory
@@ -41,7 +41,7 @@ variables:
 
 .backend-base:
   extends: .base
-  image: "node:16-alpine"
+  image: "node:16.13.0-alpine"
   cache:
     - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
       paths:
@@ -57,7 +57,7 @@ variables:
 
 .package-base:
   extends: .base
-  image: "docker"
+  image: "docker:20.10.10"
   cache:
     - key: backend-deploy-files
       paths:

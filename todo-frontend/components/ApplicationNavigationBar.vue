@@ -3,11 +3,7 @@
         <!-- Home -->
         <b-card-title>General</b-card-title>
         <div>
-            <NuxtLink
-                to="/dashboard"
-                active-class="selected-list"
-                class="list-link"
-            >
+            <NuxtLink to="/" active-class="selected-list" class="list-link">
                 <BIconGridFill></BIconGridFill>
                 Dashboard
             </NuxtLink>
@@ -121,30 +117,30 @@
             </b-form-group>
         </b-modal>
 
-        <hr />
+        <!--        <hr />-->
 
         <!-- More -->
-        <b-card-title>More</b-card-title>
-        <div>
-            <NuxtLink
-                to="/account"
-                active-class="selected-list"
-                class="list-link"
-            >
-                <BIconPersonCircle></BIconPersonCircle>
-                Account
-            </NuxtLink>
-        </div>
-        <div>
-            <NuxtLink
-                to="/settings"
-                active-class="selected-list"
-                class="list-link"
-            >
-                <BIconGearFill></BIconGearFill>
-                Settings
-            </NuxtLink>
-        </div>
+        <!--        <b-card-title>More</b-card-title>-->
+        <!--        <div>-->
+        <!--            <NuxtLink-->
+        <!--                to="/account"-->
+        <!--                active-class="selected-list"-->
+        <!--                class="list-link"-->
+        <!--            >-->
+        <!--                <BIconPersonCircle></BIconPersonCircle>-->
+        <!--                Account-->
+        <!--            </NuxtLink>-->
+        <!--        </div>-->
+        <!--        <div>-->
+        <!--            <NuxtLink-->
+        <!--                to="/settings"-->
+        <!--                active-class="selected-list"-->
+        <!--                class="list-link"-->
+        <!--            >-->
+        <!--                <BIconGearFill></BIconGearFill>-->
+        <!--                Settings-->
+        <!--            </NuxtLink>-->
+        <!--        </div>-->
     </div>
 </template>
 

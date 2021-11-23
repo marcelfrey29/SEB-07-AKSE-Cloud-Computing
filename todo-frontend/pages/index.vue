@@ -1,9 +1,9 @@
 <template>
     <div>
-        <p>Logged in? {{ $auth.loggedIn }}</p>
-        <hr />
-        <div v-if="$auth.loggedIn">
-            <p>User {{ $auth.user }}</p>
+        <div class="mt-2">
+            <b-card-title>Hello {{ $auth.user.name }}!</b-card-title>
+            <br />
+            <b-card-sub-title>Select a list to get started.</b-card-sub-title>
         </div>
     </div>
 </template>

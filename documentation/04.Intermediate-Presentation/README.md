@@ -2,7 +2,7 @@
 
 ## Architecture
 
-TODO
+![Local Architecture](Local-Architecture.jpg)
 
 ## Technologies
 

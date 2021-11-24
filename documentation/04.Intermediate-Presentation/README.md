@@ -1,4 +1,4 @@
-# Intermediate Presentations
+# Intermediate Presentation
 
 ## Architecture
 

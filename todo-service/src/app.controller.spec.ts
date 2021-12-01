@@ -16,7 +16,7 @@ describe('AppController', () => {
 
     describe('root', () => {
         it('should return "Hello World!"', () => {
-            expect(appController.getPublic()).toBe('Hello World!');
+            expect(appController.getPublic()).toBe('Todo-Backend-Service: OK');
         });
     });
 });

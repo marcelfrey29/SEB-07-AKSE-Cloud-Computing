@@ -13,6 +13,11 @@ stages:
 
 # Variables
 variables:
+  FRONTEND_CACHE_NODE_MODULES_KEY: $CI_COMMIT_REF_SLUG-frontend-node-modules-cache
+  FRONTEND_CACHE_NODE_MODULES_PATH: "todo-frontend/node_modules"
+  FRONTEND_CACHE_NPM_KEY: $CI_COMMIT_REF_SLUG-frontend-npm-cache
+  FRONTEND_CACHE_NPM_PATH: "todo-frontend/.npm"
+  FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/workspaces/aws
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
 
@@ -27,41 +32,31 @@ variables:
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory
   cache:
-    - key: $CI_COMMIT_REF_SLUG-frontend-node-modules-cache
+    - key: ${FRONTEND_CACHE_NODE_MODULES_KEY}
       paths:
-        - "todo-frontend/node_modules"
-    - key: $CI_COMMIT_REF_SLUG-frontend-npm-cache
+        - ${FRONTEND_CACHE_NODE_MODULES_PATH}
+    - key: ${FRONTEND_CACHE_NPM_KEY}
       paths:
-        - "todo-frontend/.npm"
-    - key: frontend-deploy-files
-      paths:
-        - "todo-frontend/dist"
+        - ${FRONTEND_CACHE_NPM_PATH}
   before_script:
     - cd todo-frontend
 
-.backend-base:
-  extends: .base
-  image: "node:16.13.0-alpine"
-  cache:
-    - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
-      paths:
-        - "todo-service/node_modules"
-    - key: $CI_COMMIT_REF_SLUG-backend-npm-cache
-      paths:
-        - "todo-service/.npm"
-    - key: backend-deploy-files
-      paths:
-        - "todo-service/dist"
-  before_script:
-    - cd todo-service
-
-.package-base:
-  extends: .base
-  image: "docker:20.10.10"
-  cache:
-    - key: backend-deploy-files
-      paths:
-        - "todo-service/dist"
+#.backend-base:
+#  extends: .base
+#  image: "node:16.13.0-alpine"
+#  cache:
+#    - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
+#      paths:
+#        - "todo-service/node_modules"
+#    - key: $CI_COMMIT_REF_SLUG-backend-npm-cache
+#      paths:
+#        - "todo-service/.npm"
+#  before_script:
+#    - cd todo-service
+#
+#.package-base:
+#  extends: .base
+#  image: "docker:20.10.10"
 
 .infrastructure-base:
   extends: .base
@@ -70,29 +65,28 @@ variables:
     - key: terraform-cache-aws-prod
       paths:
         - $TF_ROOT/.terraform
-    - key: frontend-deploy-files
-      paths:
-        - "todo-frontend/dist"
   before_script:
     - cd $TF_ROOT
 
 # Frontend
-Setup Frontend:
+Build Frontend:
   extends: .frontend-base
-  stage: setup
+  stage: build
   needs: [ ]
   script:
     - npm ci --cache .npm
     - echo "Installed Dependencies."
-
-Build Frontend:
-  extends: .frontend-base
-  stage: build
-  needs:
-    - Setup Frontend
-  script:
     - npm run generate
     - echo "Build complete."
+  # Use artefacts to pass artifacts from one job to another (e.g. the /dist folder).
+  # Don't use "cache" for this use case!
+  # If the job uses "needs" (dependencies), artefacts are injected by default in all following jobs of the pipeline,
+  # so there is no need to import them. ("They are inherited")
+  # Path are relative to the project root.
+  artifacts:
+    paths:
+      - ${FRONTEND_ARTEFACT_DIST_FOLDER_PATH}
+    expire_in: 60 min
 
 Test Frontend:
   extends: .frontend-base
@@ -100,65 +94,65 @@ Test Frontend:
   needs:
     - Build Frontend
   script:
-    - npm run test
+    - npm run test:unit
     - echo "Unit Tests complete."
-    - npm run lint:check:style
+    - npm run lint:prettier:check
     - echo "Prettier Checks complete."
-    - npm run lint:check:js
+    - npm run lint:eslint:check
     - echo "ESLint Checks complete."
 
-# TodoService
-Setup Todo Service:
-  extends: .backend-base
-  stage: setup
-  needs: [ ]
-  script:
-    - npm ci --cache .npm
-    - echo "Installed Dependencies."
-
-Build Todo Service:
-  extends: .backend-base
-  stage: build
-  needs:
-    - Setup Todo Service
-  script:
-    - npm run build
-    - echo "Build complete."
-
-Test Todo Service:
-  extends: .backend-base
-  stage: test
-  needs:
-    - Build Todo Service
-  script:
-    - npm run test
-    - echo "Unit Tests complete."
-    - npm run format:verify
-    - echo "Prettier Checks complete."
-
-Package Todo Service:
-  extends: .package-base
-  stage: package
-  needs:
-    - Test Todo Service
-  script:
-    - cd todo-service
-    - echo "TODO..."
-    - echo "Packaged Todo-Service."
-    - echo "TODO..."
-    - echo "Uploaded Todo-Service."
-
-# Keycloak
-Package Keycloak:
-  extends: .package-base
-  stage: package
-  needs: [ ]
-  script:
-    - cd keycloak
-    - echo "TODO..."
-    - echo "Packaged Keycloak."
-    - echo "TODO..."
-    - echo "Uploaded Keycloak."
+## TodoService
+#Setup Todo Service:
+#  extends: .backend-base
+#  stage: setup
+#  needs: [ ]
+#  script:
+#    - npm ci --cache .npm
+#    - echo "Installed Dependencies."
+#
+#Build Todo Service:
+#  extends: .backend-base
+#  stage: build
+#  needs:
+#    - Setup Todo Service
+#  script:
+#    - npm run build
+#    - echo "Build complete."
+#
+#Test Todo Service:
+#  extends: .backend-base
+#  stage: test
+#  needs:
+#    - Build Todo Service
+#  script:
+#    - npm run test
+#    - echo "Unit Tests complete."
+#    - npm run format:verify
+#    - echo "Prettier Checks complete."
+#
+#Package Todo Service:
+#  extends: .package-base
+#  stage: package
+#  needs:
+#    - Test Todo Service
+#  script:
+#    - cd todo-service
+#    - echo "TODO..."
+#    - echo "Packaged Todo-Service."
+#    - echo "TODO..."
+#    - echo "Uploaded Todo-Service."
+#
+## Keycloak
+#Package Keycloak:
+#  extends: .package-base
+#  stage: package
+#  needs: [ ]
+#  script:
+#    - cd keycloak
+#    - echo "TODO..."
+#    - echo "Packaged Keycloak."
+#    - echo "TODO..."
+#    - echo "Uploaded Keycloak."
 
 # Terraform
 Initialize Terraform:
@@ -184,8 +178,9 @@ Plan Deployment:
   needs:
     - Validate Terraform
     - Build Frontend
-    - Package Todo Service
-    - Package Keycloak
+    - Test Frontend
+  #    - Package Todo Service
+  #    - Package Keycloak
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -203,6 +198,7 @@ Plan Deployment:
     - cd dist
     - pwd
     - ls -la
+    - cat index.html
     - echo "Planning for deployment finished."
   artifacts:
     name: plan
@@ -211,22 +207,22 @@ Plan Deployment:
     reports:
       terraform: ${TF_ROOT}/plan.json
 
-Deployment:
-  extends: .infrastructure-base
-  stage: deploy
-  needs:
-    - Plan Deployment
-  script:
-    - gitlab-terraform apply
-    - cd ../../../todo-frontend/dist
-    - ls -la
-    - echo "Deploy complete."
-  environment:
-    name: production
-  #  rules:
-  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  #      when: manual
-  when: manual
+#Deployment:
+#  extends: .infrastructure-base
+#  stage: deploy
+#  needs:
+#    - Plan Deployment
+#  script:
+#    - gitlab-terraform apply
+#    - cd ../../../todo-frontend/dist
+#    - ls -la
+#    - echo "Deploy complete."
+#  environment:
+#    name: production
+#  #  rules:
+#  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+#  #      when: manual
+#  when: manual
 
 Destroy:
   extends: .infrastructure-base

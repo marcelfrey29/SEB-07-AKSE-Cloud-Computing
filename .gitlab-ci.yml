@@ -13,13 +13,23 @@ stages:
 
 # Variables
 variables:
-  FRONTEND_CACHE_NODE_MODULES_KEY: $CI_COMMIT_REF_SLUG-frontend-node-modules-cache
-  FRONTEND_CACHE_NODE_MODULES_PATH: "todo-frontend/node_modules"
-  FRONTEND_CACHE_NPM_KEY: $CI_COMMIT_REF_SLUG-frontend-npm-cache
-  FRONTEND_CACHE_NPM_PATH: "todo-frontend/.npm"
-  FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
+  # Terraform
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/workspaces/aws
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
+  # Cache
+  FRONTEND_CACHE_NODE_MODULES_KEY: "frontend-node-modules-cache"
+  FRONTEND_CACHE_NODE_MODULES_PATH: "todo-frontend/node_modules"
+  FRONTEND_CACHE_NPM_KEY: "frontend-npm-cache"
+  FRONTEND_CACHE_NPM_PATH: "todo-frontend/.npm"
+  BACKEND_CACHE_NODE_MODULES_KEY: "backend-node-modules-cache"
+  BACKEND_CACHE_NODE_MODULES_PATH: "todo-service/node_modules"
+  BACKEND_CACHE_NPM_KEY: "backend-npm-cache"
+  BACKEND_CACHE_NPM_PATH: "todo-service/.npm"
+  INFRASTRUCTURE_CACHE_TERRAFORM_KEY: "terraform-cache-aws-prod"
+  INFRASTRUCTURE_CACHE_TERRAFORM_PATH: ${TF_ROOT}/.terraform
+  # Artefacts
+  FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
+  BACKEND_ARTEFACT_DIST_FOLDER_PATH: "todo-service/dist"
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -40,31 +50,35 @@ variables:
         - ${FRONTEND_CACHE_NPM_PATH}
   before_script:
     - cd todo-frontend
+    - npm set timeout=600000
+    - echo "Set npm timeout to 10 min."
 
-#.backend-base:
-#  extends: .base
-#  image: "node:16.13.0-alpine"
-#  cache:
-#    - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
-#      paths:
-#        - "todo-service/node_modules"
-#    - key: $CI_COMMIT_REF_SLUG-backend-npm-cache
-#      paths:
-#        - "todo-service/.npm"
-#  before_script:
-#    - cd todo-service
-#
-#.package-base:
-#  extends: .base
-#  image: "docker:20.10.10"
+.backend-base:
+  extends: .base
+  image: "node:16.13.0-alpine"
+  cache:
+    - key: ${BACKEND_CACHE_NODE_MODULES_KEY}
+      paths:
+        - ${BACKEND_CACHE_NODE_MODULES_PATH}
+    - key: ${BACKEND_CACHE_NPM_KEY}
+      paths:
+        - ${BACKEND_CACHE_NPM_PATH}
+  before_script:
+    - cd todo-service
+    - npm set timeout=600000
+    - echo "Set npm timeout to 10 min."
+
+.package-base:
+  extends: .base
+  image: "docker:20.10.10"
 
 .infrastructure-base:
   extends: .base
   image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
   cache:
-    - key: terraform-cache-aws-prod
+    - key: ${INFRASTRUCTURE_CACHE_TERRAFORM_KEY}
       paths:
-        - $TF_ROOT/.terraform
+        - ${INFRASTRUCTURE_CACHE_TERRAFORM_PATH}
   before_script:
     - cd $TF_ROOT
 
@@ -101,46 +115,49 @@ Test Frontend:
     - npm run lint:eslint:check
     - echo "ESLint Checks complete."
 
-## TodoService
-#Setup Todo Service:
-#  extends: .backend-base
-#  stage: setup
-#  needs: [ ]
-#  script:
-#    - npm ci --cache .npm
-#    - echo "Installed Dependencies."
-#
-#Build Todo Service:
-#  extends: .backend-base
-#  stage: build
-#  needs:
-#    - Setup Todo Service
-#  script:
-#    - npm run build
-#    - echo "Build complete."
-#
-#Test Todo Service:
-#  extends: .backend-base
-#  stage: test
-#  needs:
-#    - Build Todo Service
-#  script:
-#    - npm run test
-#    - echo "Unit Tests complete."
-#    - npm run format:verify
-#    - echo "Prettier Checks complete."
-#
-#Package Todo Service:
-#  extends: .package-base
-#  stage: package
-#  needs:
-#    - Test Todo Service
-#  script:
-#    - cd todo-service
-#    - echo "TODO..."
-#    - echo "Packaged Todo-Service."
-#    - echo "TODO..."
-#    - echo "Uploaded Todo-Service."
+# TodoService
+Build Todo-Service:
+  extends: .backend-base
+  stage: build
+  needs: [ ]
+  script:
+    - npm ci --cache .npm
+    - echo "Installed Dependencies."
+    - npm run build
+    - echo "Build complete."
+  artifacts:
+    paths:
+      - ${BACKEND_ARTEFACT_DIST_FOLDER_PATH}
+    expire_in: 60 min
+
+Test Todo-Service:
+  extends: .backend-base
+  stage: test
+  needs:
+    - Build Todo-Service
+  script:
+    - npm run test:unit
+    - echo "Unit Tests complete."
+    - npm run lint:prettier:check
+    - echo "Prettier Checks complete."
+    - npm run lint:eslint:check
+    - echo "ESLint Checks complete."
+
+Package Todo-Service:
+  extends: .package-base
+  stage: package
+  needs:
+    - Test Todo-Service
+  script:
+    - echo "TODO..."
+    - cd todo-service
+    - ls -la
+    - cd dist
+    - ls -la
+    - echo "TODO..."
+    - echo "Packaged Todo-Service."
+    - echo "TODO..."
+    - echo "Uploaded Todo-Service."
 #
 ## Keycloak
 #Package Keycloak:
@@ -177,9 +194,8 @@ Plan Deployment:
   stage: verify
   needs:
     - Validate Terraform
-    - Build Frontend
     - Test Frontend
-  #    - Package Todo Service
+    - Package Todo-Service
   #    - Package Keycloak
   script:
     - gitlab-terraform plan
@@ -199,6 +215,12 @@ Plan Deployment:
     - pwd
     - ls -la
     - cat index.html
+    - echo "TODO FRONTEND DONE"
+    - cd ../../todo-service
+    - ls -la
+    - cd dist
+    - ls -la
+    - echo "TODO SERVICE DONE"
     - echo "Planning for deployment finished."
   artifacts:
     name: plan

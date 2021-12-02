@@ -100,8 +100,10 @@ Build Frontend:
     - echo "Build complete."
   # Use artefacts to pass artifacts from one job to another (e.g. the /dist folder).
   # Don't use "cache" for this use case!
-  # If the job uses "needs" (dependencies), artefacts are injected by default in all following jobs of the pipeline,
-  # so there is no need to import them. ("They are inherited")
+  # Artifacts are only passed to the next stage by default, so there is no need to import them then.
+  # If the artifact is needed two plus stages later, this does not work.dependencies:
+  # In this case, we need to tell GitLab to download the artifacts.dependencies:
+  # To do so, we need to specify the 'dependencies' keyword in that later job and reference the job that is generating the artefact.
   # Path are relative to the project root.
   artifacts:
     paths:
@@ -153,9 +155,14 @@ Package Todo-Service:
   extends: .package-base
   stage: package
   needs:
+    - Build Todo-Service
     - Test Todo-Service
-    - Test Frontend
-    - Validate Terraform
+  # With dependencies, we can define jobs we want to download artifacts from.
+  # This is required if the artifacts are not generated in the previous stage.
+  # If a job is defines as dependency, it has to be added to 'needs' (needed jobs) as well
+  # In this case, we download the artifact from the 'Build Todo-Service' job, which is 2 stages before
+  dependencies:
+    - Build Todo-Service
   script:
     - echo "TODO..."
     - cd todo-service
@@ -189,9 +196,12 @@ Plan Deployment:
   extends: .infrastructure-base
   stage: verify
   needs:
-    - Initialize Terraform
-    - Package Todo-Service
+    - Validate Terraform
+    - Build Frontend
     - Test Frontend
+    - Package Todo-Service
+  dependencies:
+    - Build Frontend
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -228,9 +238,13 @@ Deployment:
   extends: .infrastructure-base
   stage: deploy
   needs:
+    - Build Frontend
     - Plan Deployment
+  dependencies:
+    - Build Frontend
   script:
     #    - gitlab-terraform apply
+    - echo "TODO..."
     - cd ../../../todo-frontend/dist
     - ls -la
     - echo "Deploy complete."

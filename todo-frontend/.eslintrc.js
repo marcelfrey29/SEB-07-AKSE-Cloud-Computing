@@ -9,7 +9,13 @@ module.exports = {
         'plugin:nuxt/recommended',
         'prettier',
     ],
-    ignorePatterns: ['.eslintrc.js', '.gitignore', '.nuxt', 'dist', 'node_modules'],
+    ignorePatterns: [
+        '.eslintrc.js',
+        '.gitignore',
+        '.nuxt',
+        'dist',
+        'node_modules',
+    ],
     plugins: [],
     // add your custom rules here
     rules: {},

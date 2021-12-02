@@ -13,6 +13,12 @@ stages:
 
 # Variables
 variables:
+  # GitLab
+  # By default, GitLab runs "git clean" after checkout, which deletes all untracked and ignored files...
+  # This deletes "cache" and "artifacts" directories, which then cause problems...
+  #     - Cache is useless, because the extracted cache is immediately deleted
+  #     - Artifacts can't be accessed, because the injected /dist directory is deleted
+  GIT_CLEAN_FLAGS: none
   # Terraform
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/workspaces/aws
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
@@ -88,9 +94,9 @@ Build Frontend:
   stage: build
   needs: [ ]
   script:
-    - npm ci --cache .npm
+    - npm ci --cache .npm --prefer-offline
     - echo "Installed Dependencies."
-    - npm run generate
+    - npm run generate:dev
     - echo "Build complete."
   # Use artefacts to pass artifacts from one job to another (e.g. the /dist folder).
   # Don't use "cache" for this use case!

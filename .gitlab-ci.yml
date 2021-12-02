@@ -37,7 +37,7 @@ variables:
 
 .frontend-base:
   extends: .base
-  image: "node:16.13.0-alpine"
+  image: "node:16.13.0-bullseye"
   # Cache only works for directories inside the project!
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory

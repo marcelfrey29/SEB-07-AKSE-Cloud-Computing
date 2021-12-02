@@ -154,6 +154,8 @@ Package Todo-Service:
   stage: package
   needs:
     - Test Todo-Service
+    - Test Frontend
+    - Validate Terraform
   script:
     - echo "TODO..."
     - cd todo-service
@@ -176,10 +178,9 @@ Initialize Terraform:
 
 Validate Terraform:
   extends: .infrastructure-base
-  stage: verify
+  stage: test
   needs:
     - Initialize Terraform
-    - Package Todo-Service
   script:
     - gitlab-terraform validate
     - echo "Validated Terraform Code."
@@ -227,7 +228,6 @@ Deployment:
   extends: .infrastructure-base
   stage: deploy
   needs:
-    - Validate Terraform
     - Plan Deployment
   script:
     #    - gitlab-terraform apply

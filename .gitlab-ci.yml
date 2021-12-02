@@ -164,18 +164,6 @@ Package Todo-Service:
     - echo "Packaged Todo-Service."
     - echo "TODO..."
     - echo "Uploaded Todo-Service."
-#
-## Keycloak
-#Package Keycloak:
-#  extends: .package-base
-#  stage: package
-#  needs: [ ]
-#  script:
-#    - cd keycloak
-#    - echo "TODO..."
-#    - echo "Packaged Keycloak."
-#    - echo "TODO..."
-#    - echo "Uploaded Keycloak."
 
 # Terraform
 Initialize Terraform:
@@ -188,9 +176,10 @@ Initialize Terraform:
 
 Validate Terraform:
   extends: .infrastructure-base
-  stage: test
+  stage: verify
   needs:
     - Initialize Terraform
+    - Package Todo-Service
   script:
     - gitlab-terraform validate
     - echo "Validated Terraform Code."
@@ -199,10 +188,9 @@ Plan Deployment:
   extends: .infrastructure-base
   stage: verify
   needs:
-    - Validate Terraform
-    - Test Frontend
+    - Initialize Terraform
     - Package Todo-Service
-  #    - Package Keycloak
+    - Test Frontend
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -235,21 +223,22 @@ Plan Deployment:
     reports:
       terraform: ${TF_ROOT}/plan.json
 
-#Deployment:
-#  extends: .infrastructure-base
-#  stage: deploy
-#  needs:
-#    - Plan Deployment
-#  script:
-#    - gitlab-terraform apply
-#    - cd ../../../todo-frontend/dist
-#    - ls -la
-#    - echo "Deploy complete."
-#  environment:
-#    name: production
-#  #  rules:
-#  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-#  #      when: manual
+Deployment:
+  extends: .infrastructure-base
+  stage: deploy
+  needs:
+    - Validate Terraform
+    - Plan Deployment
+  script:
+    #    - gitlab-terraform apply
+    - cd ../../../todo-frontend/dist
+    - ls -la
+    - echo "Deploy complete."
+  environment:
+    name: production
+  #  rules:
+  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  #      when: manual
 #  when: manual
 
 Destroy:

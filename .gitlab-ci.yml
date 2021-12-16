@@ -93,6 +93,9 @@ Build Frontend:
   extends: .frontend-base
   stage: build
   needs: [ ]
+  only:
+    changes:
+      - todo-frontend/**/*
   script:
     - npm ci --cache .npm --prefer-offline
     - echo "Installed Dependencies."
@@ -115,6 +118,9 @@ Test Frontend:
   stage: test
   needs:
     - Build Frontend
+  only:
+    changes:
+      - todo-frontend/**/*
   script:
     - npm run test:unit
     - echo "Unit Tests complete."
@@ -128,6 +134,9 @@ Build Todo-Service:
   extends: .backend-base
   stage: build
   needs: [ ]
+  only:
+    changes:
+      - todo-service/**/*
   script:
     - npm ci --cache .npm
     - echo "Installed Dependencies."
@@ -143,6 +152,9 @@ Test Todo-Service:
   stage: test
   needs:
     - Build Todo-Service
+  only:
+    changes:
+      - todo-service/**/*
   script:
     - npm run test:unit
     - echo "Unit Tests complete."
@@ -163,6 +175,9 @@ Package Todo-Service:
   # In this case, we download the artifact from the 'Build Todo-Service' job, which is 2 stages before
   dependencies:
     - Build Todo-Service
+  #  only:
+  #    changes:
+  #      - todo-service/**/*
   script:
     - echo "TODO..."
     - cd todo-service
@@ -188,6 +203,9 @@ Validate Terraform:
   stage: test
   needs:
     - Initialize Terraform
+  only:
+    changes:
+      - terraform/**/*
   script:
     - gitlab-terraform validate
     - echo "Validated Terraform Code."

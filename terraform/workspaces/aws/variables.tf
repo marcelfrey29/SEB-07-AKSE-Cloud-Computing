@@ -7,6 +7,18 @@ variable "aws_tags" {
     }
 }
 
+variable "vpc_cidr_block" {
+    description = "The CIDR Block for the VPC"
+    type        = string
+    default     = "10.0.0.0/24"
+}
+
+variable "public_cidr_block" {
+    description = "The CIDR Block 0.0.0.0/0"
+    type        = string
+    default     = "0.0.0.0/0"
+}
+
 variable "s3_webapp_bucket_name" {
     description = "The name of the S3 Bucket of the WebApp"
     type        = string

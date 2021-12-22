@@ -1,7 +1,10 @@
 // Database Subnet based on our VPC
 resource "aws_db_subnet_group" "keycloak_db_subnet" {
     name       = "keycloak-db-subnet"
-    subnet_ids = [aws_subnet.todo_app_public_subnet.id]
+    subnet_ids = [
+        aws_subnet.todo_app_public_subnet_a.id,
+        aws_subnet.todo_app_public_subnet_b.id
+    ]
     tags       = var.aws_tags
 }
 

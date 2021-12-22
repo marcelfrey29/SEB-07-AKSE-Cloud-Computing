@@ -50,6 +50,6 @@ variable "keycloak_db_port" {
 
 variable "todo_db_table_name" {
     description = "The name of the DynamoDB Table"
-    type = string
-    default = "Todos"
+    type        = string
+    default     = "Todos"
 }

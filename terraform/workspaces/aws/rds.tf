@@ -44,21 +44,29 @@ resource "aws_db_instance" "keycloak_db" {
 
 // Security Group (Firewall) for the RDS Host (the underlying EC2 instance)
 resource "aws_security_group" "keycloak_db_sg" {
+    // Info: Not applied because this would require a recreate
+    //    name = "Keycloak DB Security Group"
+    //    description = "Allow DB Connections only"
     vpc_id = aws_vpc.todo_app_vpc.id
+    tags   = var.aws_tags
+}
 
-    // Allow incoming traffic only on the db port
-    ingress {
-        protocol  = "tcp"
-        from_port = var.keycloak_db_port
-        to_port   = var.keycloak_db_port
-    }
+resource "aws_security_group_rule" "keycloak_db_sg_ingress_allow_connections" {
+    description       = "Allow Connections to the DB"
+    type              = "ingress"
+    security_group_id = aws_security_group.keycloak_db_sg.id
+    protocol          = "tcp"
+    from_port         = var.keycloak_db_port
+    to_port           = var.keycloak_db_port
+    cidr_blocks       = [var.public_cidr_block]
+}
 
-    // Allow all outgoing traffic
-    egress {
-        protocol  = "tcp"
-        from_port = 0
-        to_port   = 65535
-    }
-
-    tags = var.aws_tags
+resource "aws_security_group_rule" "keycloak_db_sg_egress_allow_all" {
+    description       = "Allow all outgoing traffic"
+    type              = "egress"
+    security_group_id = aws_security_group.keycloak_db_sg.id
+    protocol          = "tcp"
+    from_port         = 0
+    to_port           = 65535
+    cidr_blocks       = [var.public_cidr_block]
 }

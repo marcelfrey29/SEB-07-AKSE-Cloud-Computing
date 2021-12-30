@@ -9,4 +9,6 @@ locals {
         ".json" : "application/json"
         "DEFAULT_VALUE" : "text/plain"
     }
+
+    cluster_name = "akse-todo-cluster"
 }

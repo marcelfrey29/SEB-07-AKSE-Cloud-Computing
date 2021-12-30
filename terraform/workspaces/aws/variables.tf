@@ -53,3 +53,15 @@ variable "todo_db_table_name" {
     type        = string
     default     = "Todos"
 }
+
+variable "keycloak_port" {
+    description = "The port where Keycloak is listening"
+    type        = number
+    default     = 5902
+}
+
+variable "todo_service_port" {
+    description = "The Port where the Todo-Service is listening"
+    type        = number
+    default     = 5903
+}

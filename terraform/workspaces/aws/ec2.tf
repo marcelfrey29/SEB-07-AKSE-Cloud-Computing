@@ -1,12 +1,13 @@
 resource "aws_instance" "container_host" {
-    ami                    = "ami-05d34d340fb1d89e5" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
-    instance_type          = "t2.micro"
-    subnet_id              = aws_subnet.todo_app_public_subnet_a.id
-    availability_zone      = "eu-central-1a"
-    vpc_security_group_ids = [aws_security_group.container_host.id]
-    iam_instance_profile   = aws_iam_instance_profile.container_host.name
+    ami                         = "ami-05d34d340fb1d89e5" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
+    instance_type               = "t2.micro"
+    subnet_id                   = aws_subnet.todo_app_public_subnet_a.id
+    availability_zone           = "eu-central-1a"
+    vpc_security_group_ids      = [aws_security_group.container_host.id]
+    associate_public_ip_address = true
+    iam_instance_profile        = aws_iam_instance_profile.container_host.name
     # Install the ECS Agent
-    user_data              = templatefile("${path.module}/ec2-user-data/container_host.tftpl", {
+    user_data                   = templatefile("${path.module}/ec2-user-data/container_host.tftpl", {
         cluster_name = local.cluster_name
     })
 
@@ -20,7 +21,11 @@ resource "aws_instance" "container_host" {
         aws_ecs_cluster.todo_app_cluster, # Make sure the ECS Agent registration works
         aws_iam_instance_profile.container_host
     ]
-    tags       = var.aws_tags
+
+    # The name of the EC2 Instance can be set via Tag-Meta-Data
+    tags = merge(var.aws_tags, {
+        Name = "ECS-Container-Host"
+    })
 }
 
 // Security Group (Firewall) for the EC2 Container Hosts

@@ -5,11 +5,14 @@
 
 sudo yum update -y
 sudo yum install -y ecs-init
-sudo service docker start
-sudo service start ecs
 
 # Configure ECS Agent - Join the Cluster
 # See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html
 # and https://docs.aws.amazon.com/AmazonECS/latest/developerguide/bootstrap_container_instance.html
 
-echo "ECS_CLUSTER=${cluster_name}" >> /etc/ecs/ecs.config
+echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
+
+# Start Docker and ECS Agent
+
+sudo service docker start
+sudo start ecs

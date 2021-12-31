@@ -1,3 +1,5 @@
+// TODO: After initial create and setup, an reboot is required to successfully register the instance as ECS Container Host.
+//       The manual reboot is the only manual required step - everything else is fully automated!
 resource "aws_instance" "container_host" {
     ami                         = "ami-05d34d340fb1d89e5" # Amazon Linux 2 AMI (HVM) - Kernel 5.10, SSD Volume Type
     instance_type               = "t2.micro"

@@ -25,6 +25,12 @@ variable "s3_webapp_bucket_name" {
     default     = "todo-frontend.akse.hhn"
 }
 
+variable "keycloak_db_vendor" {
+    description = "The vendor of the keycloak database (has the match the value keycloak expects)"
+    type        = string
+    default     = "postgres"
+}
+
 variable "keycloak_db_username" {
     description = "The username to access the database"
     type        = string
@@ -58,6 +64,17 @@ variable "keycloak_port" {
     description = "The port where Keycloak is listening"
     type        = number
     default     = 5902
+}
+
+variable "keycloak_user" {
+    description = "The username for the Keycloak Admin Account"
+    type        = string
+}
+
+variable "keycloak_password" {
+    description = "The password of the Keycloak Admin Account"
+    type        = string
+    sensitive   = true
 }
 
 variable "todo_service_port" {

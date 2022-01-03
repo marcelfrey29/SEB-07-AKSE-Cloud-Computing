@@ -1,7 +1,7 @@
 <template>
     <div>
         <b-container fluid>
-            <b-row>
+            <b-row v-if="todos.length > 0">
                 <b-col class="p-0">
                     <div v-for="todo in todos" :key="'todo-' + todo.sortKey">
                         <TodoComponent
@@ -11,6 +11,14 @@
                             @delete-todo="deleteTodo($event)"
                         ></TodoComponent>
                     </div>
+                </b-col>
+            </b-row>
+            <b-row v-else>
+                <b-col class="p-0">
+                    <b-card-sub-title class="mt-3">
+                        You don't have any todos in this list. Create a new todo
+                        by clicking the button below.
+                    </b-card-sub-title>
                 </b-col>
             </b-row>
             <b-row>
@@ -23,8 +31,8 @@
                                 'create-todo-modal'
                             ].show()
                         "
-                        >Create Todo</b-button
-                    >
+                        >Create Todo
+                    </b-button>
 
                     <!-- Create List Popup -->
                     <TodoEditor

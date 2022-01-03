@@ -3,6 +3,7 @@
         <!-- Header-->
         <b-navbar type="dark" variant="primary">
             <b-navbar-brand
+                v-if="$store.state.auth.loggedIn"
                 v-b-toggle.mobile-navigation-sidebar
                 class="cursor-hover d-md-none"
             >
@@ -10,7 +11,8 @@
             </b-navbar-brand>
             <b-navbar-brand>Todo App</b-navbar-brand>
 
-            <b-navbar-nav class="ml-auto">
+            <!-- Authenticated NavBar -->
+            <b-navbar-nav v-if="$store.state.auth.loggedIn" class="ml-auto">
                 <b-dropdown
                     id="account-actions"
                     variant="none"
@@ -61,10 +63,16 @@
                     </b-dropdown-form>
                 </b-dropdown>
             </b-navbar-nav>
+
+            <!-- Login -->
+            <b-navbar-nav v-else class="ml-auto">
+                <b-button variant="light" @click="login">Sign in</b-button>
+            </b-navbar-nav>
         </b-navbar>
 
         <!-- Mobile-Navigation -->
         <b-sidebar
+            v-if="$store.state.auth.loggedIn"
             id="mobile-navigation-sidebar"
             title="Navigation"
             shadow
@@ -76,7 +84,7 @@
         </b-sidebar>
 
         <!-- Content -->
-        <b-container fluid>
+        <b-container v-if="$store.state.auth.loggedIn" fluid>
             <b-row cols="1" cols-md="2" cols-lg="3">
                 <!-- Left: Navigation -->
                 <b-col class="d-none d-md-block" md="4" lg="3">
@@ -89,7 +97,15 @@
                 </b-col>
 
                 <!-- Right: -->
-                <b-col class="d-none d-lg-block" lg="3"> </b-col>
+                <b-col class="d-none d-lg-block" lg="3"></b-col>
+            </b-row>
+        </b-container>
+
+        <b-container v-else>
+            <b-row>
+                <b-col>
+                    <Marketing></Marketing>
+                </b-col>
             </b-row>
         </b-container>
 
@@ -104,15 +120,30 @@ import Component from 'vue-class-component'
 import { BIconList } from 'bootstrap-vue/src/icons'
 import LoggedInUser from '~/types/LoggedInUser.interface'
 import ApplicationNavigationBar from '~/components/ApplicationNavigationBar.vue'
+import Marketing from '~/components/marketing.vue'
 
 /**
  * The default layout for all application pages.
  */
 @Component({
-    components: { ApplicationNavigationBar, BIconList },
-    middleware: 'auth.middleware',
+    components: { Marketing, ApplicationNavigationBar, BIconList },
 })
 export default class Default extends Vue {
+    mounted(): void {
+        if (this.$route.path === '/login') {
+            setTimeout(() => {
+                this.$router.push('/')
+                setTimeout(() => {
+                    location.reload()
+                }, 250)
+            }, 250)
+        }
+    }
+
+    async login(): Promise<void> {
+        await this.$auth.loginWith('keycloak')
+    }
+
     async logout(): Promise<void> {
         await this.$auth.logout()
     }

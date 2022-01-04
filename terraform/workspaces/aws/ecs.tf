@@ -22,16 +22,25 @@ resource "aws_ecs_task_definition" "todo_app_services" {
     tags                  = var.aws_tags
 }
 
+// The Role for Executing ECS Tasks
 // See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html
 resource "aws_iam_role" "todo_app_services_task_execution_role" {
     name               = "Todo-App-Services-Task-Execution-Role"
     description        = "The role for launching the keycloak task"
-    assume_role_policy = file("${path.module}/policies/allow-assume-role.json")
+    // Set Trust Relation: Allow ECS to "assume role"
+    assume_role_policy = file("${path.module}/policies/allow-ecs-to-assume-role.json")
     tags               = var.aws_tags
 }
 
+// Attach the AWS Managed ECS Task Execution Role
+resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {
+    role       = aws_iam_role.todo_app_services_task_execution_role.id
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+// Allow Secrets Manager Access via Inline Policy
 resource "aws_iam_role_policy" "todo_app_services_task_execution_role" {
-    role   = aws_iam_role.container_host.id
+    role   = aws_iam_role.todo_app_services_task_execution_role.id
     policy = templatefile("${path.module}/policies/keycloak-task-execution-role.tftpl", {
         keycloak_rds_secret  = aws_secretsmanager_secret.keycloak_rds_db_user_password.arn
         keycloak_user_secret = aws_secretsmanager_secret.keycloak_admin_password.arn

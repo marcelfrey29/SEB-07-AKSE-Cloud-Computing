@@ -4,8 +4,7 @@
         {
             "Effect": "Allow",
             "Action": [
-                "secretsmanager:GetSecretValue",
-                "kms:Decrypt"
+                "secretsmanager:GetSecretValue"
             ],
             "Resource": [
                 "${keycloak_rds_secret}",

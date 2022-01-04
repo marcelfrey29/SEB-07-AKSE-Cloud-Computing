@@ -80,7 +80,8 @@ resource "aws_security_group_rule" "container_host_ingres_backend_service" {
 resource "aws_iam_role" "container_host" {
     name               = "Container-Host-Role"
     description        = "Permissions for the Container Host EC2 Instances"
-    assume_role_policy = file("${path.module}/policies/allow-assume-role.json")
+    // Set Trust Relation: Allow EC2 to "assume role"
+    assume_role_policy = file("${path.module}/policies/allow-ec2-to-assume-role.json")
     tags               = var.aws_tags
 }
 

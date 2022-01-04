@@ -3,6 +3,19 @@ resource "aws_ecs_cluster" "todo_app_cluster" {
     tags = var.aws_tags
 }
 
+resource "aws_ecs_service" "todo_app_services" {
+    name            = "TodoAppServices"
+    cluster         = aws_ecs_cluster.todo_app_cluster.id
+    task_definition = aws_ecs_task_definition.todo_app_services.arn
+    desired_count   = 1
+    launch_type     = "EC2"
+    tags            = var.aws_tags
+    depends_on      = [
+        aws_ecs_task_definition.todo_app_services
+    ]
+    //    force_new_deployment = true
+}
+
 resource "aws_ecs_task_definition" "todo_app_services" {
     family                = "TodoAppServices"
     container_definitions = templatefile("${path.module}/ecs-tasks/todo-app-services-container.tftpl", {

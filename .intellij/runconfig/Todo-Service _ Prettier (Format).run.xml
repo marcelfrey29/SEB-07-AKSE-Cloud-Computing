@@ -3,7 +3,7 @@
     <package-json value="$PROJECT_DIR$/todo-service/package.json" />
     <command value="run" />
     <scripts>
-      <script value="format" />
+      <script value="lint:prettier:fix" />
     </scripts>
     <node-interpreter value="$USER_HOME$/.nvm/versions/node/v16.13.0/bin/node" />
     <envs />

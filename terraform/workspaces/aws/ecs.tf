@@ -4,16 +4,18 @@ resource "aws_ecs_cluster" "todo_app_cluster" {
 }
 
 resource "aws_ecs_service" "todo_app_services" {
-    name            = "TodoAppServices"
-    cluster         = aws_ecs_cluster.todo_app_cluster.id
-    task_definition = aws_ecs_task_definition.todo_app_services.arn
-    desired_count   = 1
-    launch_type     = "EC2"
-    tags            = var.aws_tags
-    depends_on      = [
+    name                               = "TodoAppServices"
+    cluster                            = aws_ecs_cluster.todo_app_cluster.id
+    task_definition                    = aws_ecs_task_definition.todo_app_services.arn
+    desired_count                      = 1
+    launch_type                        = "EC2"
+    deployment_minimum_healthy_percent = 0
+    deployment_maximum_percent         = 100
+    tags                               = var.aws_tags
+    depends_on                         = [
         aws_ecs_task_definition.todo_app_services
     ]
-    //    force_new_deployment = true
+    force_new_deployment               = true
 }
 
 resource "aws_ecs_task_definition" "todo_app_services" {

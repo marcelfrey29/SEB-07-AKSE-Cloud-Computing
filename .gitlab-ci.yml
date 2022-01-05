@@ -99,7 +99,7 @@ Build Frontend:
   script:
     - npm ci --cache .npm --prefer-offline
     - echo "Installed Dependencies."
-    - npm run generate:dev
+    - npm run generate:prod
     - echo "Build complete."
   # Use artefacts to pass artifacts from one job to another (e.g. the /dist folder).
   # Don't use "cache" for this use case!

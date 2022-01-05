@@ -51,3 +51,8 @@ resource "aws_route_table_association" "todo_app_public_routing_association" {
     subnet_id      = aws_subnet.todo_app_public_subnet_a.id
     route_table_id = aws_route_table.todo_app_public_routes.id
 }
+
+resource "aws_route_table_association" "todo_app_public_routing_b_association" {
+    subnet_id      = aws_subnet.todo_app_public_subnet_b.id
+    route_table_id = aws_route_table.todo_app_public_routes.id
+}

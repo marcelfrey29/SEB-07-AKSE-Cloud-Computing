@@ -31,3 +31,28 @@ resource "aws_secretsmanager_secret_policy" "keycloak_admin_password" {
     policy     = file("${path.module}/policies/secrets-manager-secret-access.json")
     secret_arn = aws_secretsmanager_secret.keycloak_admin_password.arn
 }
+
+// Fix to Connect to the Database with IntelliJ
+resource "aws_secretsmanager_secret" "keycloak_rds" {
+    name                    = "RDS-Postgres-IntelliJ"
+    description             = "RDS Compatible Secret for the Keycloak RDS DB to use with IntelliJ DB Tools"
+    recovery_window_in_days = 0 # Enable force deletion
+    tags                    = var.aws_tags
+}
+
+resource "aws_secretsmanager_secret_version" "keycloak_rds" {
+    secret_id     = aws_secretsmanager_secret.keycloak_rds.id
+    secret_string = jsonencode(
+    {
+        "username" : var.keycloak_db_username,
+        "password" : var.keycloak_db_password,
+        "engine" : "postgres",
+        "host" : aws_db_instance.keycloak_db.address,
+        "port" : aws_db_instance.keycloak_db.port,
+    })
+}
+
+resource "aws_secretsmanager_secret_policy" "keycloak_rds" {
+    policy     = file("${path.module}/policies/secrets-manager-secret-access.json")
+    secret_arn = aws_secretsmanager_secret.keycloak_rds.arn
+}

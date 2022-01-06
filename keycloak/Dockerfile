@@ -19,3 +19,6 @@ COPY run.sh .
 # Override Entrypoint from keycloak. The run script has to launch keycloak!
 # See https://github.com/keycloak/keycloak-containers/blob/master/server/Dockerfile
 ENTRYPOINT ./run.sh
+
+# Prevent instant container stop
+CMD ["-b", "0.0.0.0"]

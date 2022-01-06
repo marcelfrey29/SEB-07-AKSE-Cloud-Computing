@@ -11,4 +11,6 @@ locals {
     }
 
     cluster_name = "akse-todo-cluster"
+
+    cloudfront_s3_origin_id = "todo-frontend-s3-origin"
 }

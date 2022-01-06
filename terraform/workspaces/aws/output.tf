@@ -9,3 +9,7 @@ output "rds_keycloak_db_url" {
 output "ec2_container_host_url" {
     value = aws_instance.container_host.public_dns
 }
+
+output "cloudfront_frontend_url" {
+    value = aws_cloudfront_distribution.webapp.domain_name
+}

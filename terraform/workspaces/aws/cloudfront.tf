@@ -28,6 +28,27 @@ resource "aws_cloudfront_distribution" "webapp" {
         }
     }
 
+
+    // Redirects (e.g. from Keycloak) and deep links of a Single Page Application (SPA) are not working by default with CloudFront.
+    // The reason is that the routes to not existing on a file system level.
+    // As a workaround, we have to define a custom error handler that redirects 404 errors to the index.html.
+    // Then, the SPA is responsible to handle 404 errors.
+    // https://stackoverflow.com/questions/38475329/single-page-application-in-aws-cloudfront
+    custom_error_response {
+        error_code         = 404
+        response_code      = 200
+        response_page_path = "/index.html"
+    }
+
+    // S3 returns a 403 instead of a 404... Not sure why :O
+    // Where I am sure is that this rule fixes the redirect issue :D
+    custom_error_response {
+        error_code         = 403
+        response_code      = 200
+        response_page_path = "/index.html"
+    }
+
+
     restrictions {
         geo_restriction {
             restriction_type = "none"

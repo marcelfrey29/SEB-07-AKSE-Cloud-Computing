@@ -12,6 +12,8 @@ locals {
 
     cluster_name = "akse-todo-cluster"
 
+    ecs_service_keycloak_family_name = "Keycloak-Service"
+
     ecs_service_backend_family_name = "Todo-Backend-Service"
 
     cloudfront_s3_origin_id = "todo-frontend-s3-origin"

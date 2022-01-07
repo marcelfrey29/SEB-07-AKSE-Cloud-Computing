@@ -3,10 +3,10 @@ resource "aws_ecs_cluster" "todo_app_cluster" {
     tags = var.aws_tags
 }
 
-resource "aws_ecs_service" "todo_app_services" {
-    name                               = "TodoAppServices"
+resource "aws_ecs_service" "keycloak_service" {
+    name                               = local.ecs_service_keycloak_family_name
     cluster                            = aws_ecs_cluster.todo_app_cluster.id
-    task_definition                    = aws_ecs_task_definition.todo_app_services.arn
+    task_definition                    = aws_ecs_task_definition.keycloak_service.arn
     desired_count                      = 1
     launch_type                        = "EC2"
     // This deployment health configuration does NOT provide zero-downtime-deployments!
@@ -17,15 +17,14 @@ resource "aws_ecs_service" "todo_app_services" {
     deployment_maximum_percent         = 100
     tags                               = var.aws_tags
     depends_on                         = [
-        aws_ecs_task_definition.todo_app_services
+        aws_ecs_task_definition.keycloak_service
     ]
     force_new_deployment               = true
 }
 
-resource "aws_ecs_task_definition" "todo_app_services" {
-    family                = "TodoAppServices"
-    container_definitions = templatefile("${path.module}/ecs-tasks/todo-app-services-container.tftpl", {
-        // Keycloak
+resource "aws_ecs_task_definition" "keycloak_service" {
+    family                = local.ecs_service_keycloak_family_name
+    container_definitions = templatefile("${path.module}/ecs-tasks/keycloak-service-container.tftpl", {
         keycloak_port             = var.keycloak_port,
         keycloak_user             = var.keycloak_user,
         keycloak_password         = aws_secretsmanager_secret.keycloak_admin_password.arn
@@ -36,31 +35,31 @@ resource "aws_ecs_task_definition" "todo_app_services" {
         keycloak_db_password      = aws_secretsmanager_secret.keycloak_rds_db_user_password.arn
         keycloak_db_database_name = var.keycloak_db_database_name
     })
-    execution_role_arn    = aws_iam_role.todo_app_services_task_execution_role.arn
-    //    task_role_arn         = ""
+    execution_role_arn    = aws_iam_role.keycloak_services_task_execution_role.arn
     tags                  = var.aws_tags
 }
 
 // The Role for Executing ECS Tasks
 // See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html
-resource "aws_iam_role" "todo_app_services_task_execution_role" {
-    name               = "Todo-App-Services-Task-Execution-Role"
-    description        = "The role for launching the keycloak task"
+resource "aws_iam_role" "keycloak_services_task_execution_role" {
+    name               = "Keycloak-Service-Task-Execution-Role"
+    description        = "The role for launching the keycloak service container"
     // Set Trust Relation: Allow ECS to "assume role"
-    assume_role_policy = file("${path.module}/policies/allow-ecs-to-assume-role.json")
+    assume_role_policy = file("${path.module}/policies/ecs-allow-assume-role.json")
     tags               = var.aws_tags
 }
 
-// Attach the AWS Managed ECS Task Execution Role
-resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {
-    role       = aws_iam_role.todo_app_services_task_execution_role.id
+// Attach the AWS Managed ECS Task Execution Role.
+// This policy provides ECS-Core-Permission.
+resource "aws_iam_role_policy_attachment" "keycloak_service_AmazonECSTaskExecutionRolePolicy" {
+    role       = aws_iam_role.keycloak_services_task_execution_role.id
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-// Allow Secrets Manager Access via Inline Policy
-resource "aws_iam_role_policy" "todo_app_services_task_execution_role" {
-    role   = aws_iam_role.todo_app_services_task_execution_role.id
-    policy = templatefile("${path.module}/policies/keycloak-task-execution-role.tftpl", {
+// Allow ECS to Access Secrets from the Secrets Manager via Inline Policy
+resource "aws_iam_role_policy" "keycloak_services_task_execution_role" {
+    role   = aws_iam_role.keycloak_services_task_execution_role.id
+    policy = templatefile("${path.module}/policies/ecs-task-keycloak-service-execution-role.tftpl", {
         keycloak_rds_secret  = aws_secretsmanager_secret.keycloak_rds_db_user_password.arn
         keycloak_user_secret = aws_secretsmanager_secret.keycloak_admin_password.arn
     })
@@ -104,7 +103,7 @@ resource "aws_iam_role" "backend_service_task_execution_role" {
     name               = "Backend-Service-Task-Execution-Role"
     description        = "The role for launching the backend service container"
     // Set Trust Relation: Allow ECS to "assume role"
-    assume_role_policy = file("${path.module}/policies/allow-ecs-to-assume-role.json")
+    assume_role_policy = file("${path.module}/policies/ecs-allow-assume-role.json")
     tags               = var.aws_tags
 }
 

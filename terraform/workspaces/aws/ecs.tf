@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "keycloak_service" {
     tags                  = var.aws_tags
 }
 
-// The Role for Executing ECS Tasks
+// The Role for Executing ECS Tasks.
 // See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html
 resource "aws_iam_role" "keycloak_services_task_execution_role" {
     name               = "Keycloak-Service-Task-Execution-Role"
@@ -97,7 +97,7 @@ resource "aws_ecs_task_definition" "backend_service" {
     tags                  = var.aws_tags
 }
 
-// The Role for Executing ECS Tasks
+// The Role for Executing ECS Tasks.
 // See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data-secrets.html
 resource "aws_iam_role" "backend_service_task_execution_role" {
     name               = "Backend-Service-Task-Execution-Role"
@@ -107,7 +107,8 @@ resource "aws_iam_role" "backend_service_task_execution_role" {
     tags               = var.aws_tags
 }
 
-// Attach the AWS Managed ECS Task Execution Role
+// Attach the AWS Managed ECS Task Execution Role.
+// This policy provides ECS-Core-Permission.
 resource "aws_iam_role_policy_attachment" "backend_service_AmazonECSTaskExecutionRolePolicy" {
     role       = aws_iam_role.backend_service_task_execution_role.id
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"

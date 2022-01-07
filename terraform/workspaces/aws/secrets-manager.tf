@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "keycloak_rds_db_user_password" {
     name                    = "RDS-Postgres-Password"
     description             = "The password to access the RDS Postgres Instance (Required for Keycloak)"
-    recovery_window_in_days = 0 # Enable force deletion
+    recovery_window_in_days = 0 // Enable force deletion
     tags                    = var.aws_tags
 }
 
@@ -18,7 +18,7 @@ resource "aws_secretsmanager_secret_policy" "keycloak_rds_db_user_password" {
 resource "aws_secretsmanager_secret" "keycloak_admin_password" {
     name                    = "Keycloak-Admin-Password"
     description             = "The password of the Keycloak Admin Account"
-    recovery_window_in_days = 0 # Enable force deletion
+    recovery_window_in_days = 0 // Enable force deletion
     tags                    = var.aws_tags
 }
 
@@ -36,7 +36,7 @@ resource "aws_secretsmanager_secret_policy" "keycloak_admin_password" {
 resource "aws_secretsmanager_secret" "keycloak_rds" {
     name                    = "RDS-Postgres-IntelliJ"
     description             = "RDS Compatible Secret for the Keycloak RDS DB to use with IntelliJ DB Tools"
-    recovery_window_in_days = 0 # Enable force deletion
+    recovery_window_in_days = 0 // Enable force deletion
     tags                    = var.aws_tags
 }
 

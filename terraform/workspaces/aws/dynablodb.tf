@@ -17,5 +17,4 @@ resource "aws_dynamodb_table" "todo_db" {
     }
 
     tags = var.aws_tags
-
 }

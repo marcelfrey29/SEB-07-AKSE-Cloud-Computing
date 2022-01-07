@@ -28,12 +28,11 @@ resource "aws_cloudfront_distribution" "webapp" {
         }
     }
 
-
-    // Redirects (e.g. from Keycloak) and deep links of a Single Page Application (SPA) are not working by default with CloudFront.
-    // The reason is that the routes to not existing on a file system level.
-    // As a workaround, we have to define a custom error handler that redirects 404 errors to the index.html.
+    // Redirects (e.g. from Keycloak) and deep links of a Single Page Application (e.g. "/list/my-list") are not working by default with CloudFront.
+    // The reason is that the routes to not existing on the "file system level".
+    // As a workaround, we have to define a custom error handler that redirects all 404 errors to index.html.
     // Then, the SPA is responsible to handle 404 errors.
-    // https://stackoverflow.com/questions/38475329/single-page-application-in-aws-cloudfront
+    // See https://stackoverflow.com/questions/38475329/single-page-application-in-aws-cloudfront
     custom_error_response {
         error_code         = 404
         response_code      = 200
@@ -48,7 +47,6 @@ resource "aws_cloudfront_distribution" "webapp" {
         response_page_path = "/index.html"
     }
 
-
     restrictions {
         geo_restriction {
             restriction_type = "none"
@@ -62,6 +60,9 @@ resource "aws_cloudfront_distribution" "webapp" {
     tags = var.aws_tags
 }
 
+// A special CloudFront-User.
+// This user gets access to the S3 Bucket, so that CloudFront can deliver the files.
+// Access is granted via the S3-Bucket-Policy.
 resource "aws_cloudfront_origin_access_identity" "webapp" {
     comment = "CloudFront-Identity"
 }

@@ -5,10 +5,10 @@ WORKDIR /home/app
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install
+RUN npm install --only=production
 
-COPY . .
+COPY /dist ./dist
 
 EXPOSE 4000
 
-ENTRYPOINT npm run start:dev
+CMD ["node", "dist/main.js"]

@@ -81,7 +81,7 @@ resource "aws_iam_role" "container_host" {
     name               = "Container-Host-Role"
     description        = "Permissions for the Container Host EC2 Instances"
     // Set Trust Relation: Allow EC2 to "assume role"
-    assume_role_policy = file("${path.module}/policies/allow-ec2-to-assume-role.json")
+    assume_role_policy = file("${path.module}/policies/ec2-allow-assume-role.json")
     tags               = var.aws_tags
 }
 

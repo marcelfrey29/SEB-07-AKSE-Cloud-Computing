@@ -1,3 +1,9 @@
+variable "aws_region" {
+    description = "The AWS Region to create the services"
+    type        = string
+    default     = "eu-central-1"
+}
+
 variable "aws_tags" {
     description = "AWS Tags for the AKSE Project"
     type        = map(string)
@@ -73,6 +79,24 @@ variable "keycloak_user" {
 
 variable "keycloak_password" {
     description = "The password of the Keycloak Admin Account"
+    type        = string
+    sensitive   = true
+}
+
+variable "keycloak_realm" {
+    description = "The Keycloak Realm of the Todo Application"
+    type        = string
+    default     = "todoapp"
+}
+
+variable "keycloak_client_id" {
+    description = "The Keycloak Client ID for the Backend Service"
+    type        = string
+    default     = "todoservice"
+}
+
+variable "keycloak_client_secret" {
+    description = "The Keycloak Client Secret for the Backend Service"
     type        = string
     sensitive   = true
 }

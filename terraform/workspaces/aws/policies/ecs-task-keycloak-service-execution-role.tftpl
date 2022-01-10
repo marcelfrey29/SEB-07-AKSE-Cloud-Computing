@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Resource": [
+                "${keycloak_rds_secret}",
+                "${keycloak_user_secret}"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Install ECS Agent
+# See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-install.html
+# and https://github.com/aws/amazon-ecs-agent/blob/master/README.md
+
+sudo amazon-linux-extras disable docker
+sudo amazon-linux-extras install -y ecs
+
+# Configure ECS Agent - Join the Cluster
+# See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-config.html
+# and https://docs.aws.amazon.com/AmazonECS/latest/developerguide/bootstrap_container_instance.html
+
+mkdir -p /var/log/ecs /etc/ecs /var/lib/ecs/data
+echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
+
+# Start Docker and ECS Agent
+
+sudo systemctl enable --now ecs

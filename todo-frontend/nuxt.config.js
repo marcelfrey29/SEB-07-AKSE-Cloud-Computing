@@ -107,10 +107,15 @@ export default {
                 codeChallengeMethod: 'S256',
             },
         },
+        // See https://auth.nuxtjs.org/api/options#redirect
+        // Callback and Home are required in order that the login flow works!
+        // callback: Keycloak redirect the user to /login?...
+        // home: After successful login, the user should be redirected to '/' (this finishes the login flow)
         redirect: {
-            login: '/',
-            logout: '/',
-            home: false,
+            login: false,
+            logout: false,
+            home: '/',
+            callback: '/login',
         },
     },
 }

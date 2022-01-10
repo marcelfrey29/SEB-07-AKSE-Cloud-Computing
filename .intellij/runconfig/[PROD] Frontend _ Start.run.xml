@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="[DEV] Frontend | Start" type="js.build_tools.npm">
+  <configuration default="false" name="[PROD] Frontend | Start" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/todo-frontend/package.json" />
     <command value="run" />
     <scripts>
-      <script value="start:dev" />
+      <script value="start:prod" />
     </scripts>
     <node-interpreter value="$USER_HOME$/.nvm/versions/node/v16.13.0/bin/node" />
     <envs />

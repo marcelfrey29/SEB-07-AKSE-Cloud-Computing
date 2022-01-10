@@ -1,0 +1,49 @@
+[
+    {
+        "name": "Keycloak",
+        "image": "jboss/keycloak:16.1.0",
+        "memoryReservation": 256,
+        "portMappings": [
+            {
+                "containerPort": 8080,
+                "hostPort": ${keycloak_port}
+            }
+        ],
+        "environment": [
+            {
+                "name": "KEYCLOAK_USER",
+                "value": "${keycloak_user}"
+            },
+            {
+                "name": "DB_VENDOR",
+                "value": "${keycloak_db_vendor}"
+            },
+            {
+                "name": "DB_ADDR",
+                "value": "${keycloak_db_url}"
+            },
+            {
+                "name": "DB_PORT",
+                "value": "${keycloak_db_port}"
+            },
+            {
+                "name": "DB_USER",
+                "value": "${keycloak_db_user}"
+            },
+            {
+                "name": "DB_DATABASE",
+                "value": "${keycloak_db_database_name}"
+            }
+        ],
+        "secrets": [
+            {
+                "name": "KEYCLOAK_PASSWORD",
+                "valueFrom": "${keycloak_password}"
+            },
+            {
+                "name": "DB_PASSWORD",
+                "valueFrom": "${keycloak_db_password}"
+            }
+        ]
+    }
+]

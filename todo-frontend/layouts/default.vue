@@ -129,17 +129,6 @@ import Marketing from '~/components/marketing.vue'
     components: { Marketing, ApplicationNavigationBar, BIconList },
 })
 export default class Default extends Vue {
-    mounted(): void {
-        if (this.$route.path === '/login') {
-            setTimeout(() => {
-                this.$router.push('/')
-                setTimeout(() => {
-                    location.reload()
-                }, 250)
-            }, 250)
-        }
-    }
-
     async login(): Promise<void> {
         await this.$auth.loginWith('keycloak')
     }

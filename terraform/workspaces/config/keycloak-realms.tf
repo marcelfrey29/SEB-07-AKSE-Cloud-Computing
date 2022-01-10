@@ -6,7 +6,7 @@ resource "keycloak_realm" "todo-realm" {
     display_name_html = "<b>Todo App</b>"
 
     // Login settings
-    registration_allowed     = true
+    registration_allowed     = false
     remember_me              = false
     login_with_email_allowed = true
     ssl_required             = "none"

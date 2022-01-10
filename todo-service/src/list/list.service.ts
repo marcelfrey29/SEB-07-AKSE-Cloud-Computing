@@ -6,6 +6,8 @@ import {
     LIST_PARTITION_PREFIX,
     USER_PARTITION_PREFIX,
 } from '../dynamodb/dynamodb.constants';
+import { TodosService } from '../todos/todos.service';
+import { TodoElement } from '../types/Todo.interface';
 
 /**
  * The Service to manage {@link TodoList}s.
@@ -14,7 +16,10 @@ import {
 export class ListService {
     private readonly logger = new Logger(ListService.name);
 
-    constructor(private dynamodbService: DynamodbService) {}
+    constructor(
+        private todosService: TodosService,
+        private dynamodbService: DynamodbService,
+    ) {}
 
     /**
      * Get all lists of the user.
@@ -56,6 +61,48 @@ export class ListService {
             icon: listInfo.icon ?? 'check-circle-fill',
         };
         await this.dynamodbService.createList(list);
+        return await this.getLists(user);
+    }
+
+    /**
+     * Delete a list with all their todos.
+     *
+     * @param user {User} the owner of the list
+     * @param listId {string} the ID of the list to delete
+     */
+    async deleteList(user: User, listId: string) {
+        this.logger.log(
+            'Delete list with ID ' + listId + ' of user ' + user.sub,
+        );
+
+        // Get all Todos from the list to delete
+        const allTodos = await this.todosService.getTodos(user, listId);
+        this.logger.debug('There are ' + allTodos.length + ' todos to delete.');
+
+        // Delete all Todos
+        const deletePromises: Promise<TodoElement[]>[] = [];
+        allTodos.forEach((todo) => {
+            this.logger.debug(
+                'Deleting Todo ' + todo.sortKey + ' before deleting the list.',
+            );
+            deletePromises.push(
+                this.todosService.deleteTodo(
+                    user,
+                    listId,
+                    todo.sortKey.split('#')[1],
+                ),
+            );
+        });
+        await Promise.all(deletePromises);
+
+        // Delete List
+        this.logger.log(
+            'Deleted all todos of the list ' + listId + '. Deleting List.',
+        );
+        await this.dynamodbService.deleteListOfUser(
+            USER_PARTITION_PREFIX + user.sub,
+            LIST_PARTITION_PREFIX + listId,
+        );
         return await this.getLists(user);
     }
 }

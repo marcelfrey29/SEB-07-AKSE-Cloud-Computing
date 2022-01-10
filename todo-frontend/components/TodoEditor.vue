@@ -136,7 +136,7 @@ export default class TodoEditor extends Vue {
                 dueDate: this.newTodoDate,
                 isFlagged: this.newTodoFlag,
                 tags: this.newTodoTags,
-                isDone: false,
+                isDone: this.existingData.isDone,
                 owner: this.existingData.owner,
             }
         } else {

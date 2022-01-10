@@ -56,8 +56,6 @@ services:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     volumes:
       - "./.storage/todo-db/data:/home/dynamodblocal/data"
-    ports:
-      - "8000:8000" # TODO: For local development, until the keycloak bug (#5) is fixed
     networks:
       - backend
     restart: unless-stopped
@@ -73,14 +71,19 @@ services:
       - backend
       - keycloak
     environment:
+      - "SERVER_ENVIRONMENT_SETTING=${SERVER_ENVIRONMENT_SETTING}"
       - "SERVER_PORT=${SERVER_PORT}"
       - "KEYCLOAK_URL=${KEYCLOAK_URL}"
       - "KEYCLOAK_REALM=${KEYCLOAK_REALM}"
       - "KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}"
       - "KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}"
+      - "KEYCLOAK_REALM_PUBLIC_KEY=${KEYCLOAK_REALM_PUBLIC_KEY}"
       - "DYNAMODB_REGION=${DYNAMODB_REGION}"
       - "DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT}"
       - "DYNAMODB_TABLE_NAME=${DYNAMODB_TABLE_NAME}"
+      - "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}"
+      - "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}"
+      - "REGION=${DYNAMODB_REGION}"
     depends_on:
       - todo-db
     restart: unless-stopped

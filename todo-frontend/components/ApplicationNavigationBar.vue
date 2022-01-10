@@ -12,7 +12,11 @@
         <hr />
 
         <!-- Lists -->
-        <b-card-title>Lists</b-card-title>
+        <b-card-title class="mb-0">Lists</b-card-title>
+        <p class="mt-0 update-label">
+            Last Updated: {{ lastUpdateList }} &CenterDot;
+            <a class="hover cursor-pointer" @click="getLists">Update</a>
+        </p>
 
         <b-card-sub-title v-if="todoLists.length <= 0" class="mt-3">
             You don't have a list yet. Create a new list by clicking the button.
@@ -24,8 +28,23 @@
                 active-class="selected-list"
                 class="list-link"
             >
-                <BIcon :icon="list.icon" :variant="list.color"></BIcon>
-                {{ list.name }}
+                <div class="d-flex">
+                    <!-- Title & Icon -->
+                    <div>
+                        <BIcon :icon="list.icon" :variant="list.color"></BIcon>
+                        {{ list.name }}
+                    </div>
+                    <!-- List Options -->
+                    <div
+                        class="ml-auto pr-2 pl-2"
+                        @click="
+                            selectListToDelete(list),
+                                $refs['delete-list-modal'].show()
+                        "
+                    >
+                        <BIcon icon="trash-fill" variant="danger"></BIcon>
+                    </div>
+                </div>
             </NuxtLink>
         </div>
 
@@ -36,6 +55,24 @@
             @click="$refs['create-list-modal'].show()"
             >Create List
         </b-button>
+
+        <!-- Delete List Modal -->
+        <b-modal
+            ref="delete-list-modal"
+            centered
+            title="Delete the List"
+            @ok="deleteList()"
+        >
+            <p class="m-0">Are you sure that you want to delete the List?</p>
+            <p class="m0">All Todos in this list will be deleted as well.</p>
+
+            <template #modal-footer="{ ok, cancel }">
+                <b-button variant="outline-secondary" @click="cancel()">
+                    Cancel
+                </b-button>
+                <b-button variant="danger" @click="ok()"> Delete </b-button>
+            </template>
+        </b-modal>
 
         <!-- Create List Popup -->
         <b-modal
@@ -116,31 +153,6 @@
                 </b-form-radio-group>
             </b-form-group>
         </b-modal>
-
-        <!--        <hr />-->
-
-        <!-- More -->
-        <!--        <b-card-title>More</b-card-title>-->
-        <!--        <div>-->
-        <!--            <NuxtLink-->
-        <!--                to="/account"-->
-        <!--                active-class="selected-list"-->
-        <!--                class="list-link"-->
-        <!--            >-->
-        <!--                <BIconPersonCircle></BIconPersonCircle>-->
-        <!--                Account-->
-        <!--            </NuxtLink>-->
-        <!--        </div>-->
-        <!--        <div>-->
-        <!--            <NuxtLink-->
-        <!--                to="/settings"-->
-        <!--                active-class="selected-list"-->
-        <!--                class="list-link"-->
-        <!--            >-->
-        <!--                <BIconGearFill></BIconGearFill>-->
-        <!--                Settings-->
-        <!--            </NuxtLink>-->
-        <!--        </div>-->
     </div>
 </template>
 
@@ -156,7 +168,9 @@ import {
     BIconPersonFill,
     BIconBriefcaseFill,
     BIconCheckCircleFill,
+    BIconTrashFill,
 } from 'bootstrap-vue/src/icons'
+import { Watch } from 'vue-property-decorator'
 import { TodoList } from '~/types/TodoList.interface'
 
 /**
@@ -172,6 +186,7 @@ import { TodoList } from '~/types/TodoList.interface'
         BIconPersonFill,
         BIconBriefcaseFill,
         BIconCheckCircleFill,
+        BIconTrashFill,
     },
 })
 export default class ApplicationNavigationBar extends Vue {
@@ -179,14 +194,33 @@ export default class ApplicationNavigationBar extends Vue {
     private readonly BASE_URL =
         process.env.NUXT_ENV_TODO_SERVICE_URL ?? 'http://localhost:4000'
 
+    private lastUpdateList = 'Never'
     private newListName = ''
     private newListColor = 'primary'
     private newListIcon = 'check-circle-fill'
+    private listToDelete: TodoList = {
+        color: '',
+        icon: '',
+        name: '',
+        partitionKey: '',
+        sortKey: '',
+    }
 
     async mounted(): Promise<void> {
+        await this.getLists()
+    }
+
+    async getLists(): Promise<void> {
         try {
             this.todoLists = await this.$axios.$get(this.BASE_URL + '/lists')
         } catch (error) {}
+    }
+
+    @Watch('todoLists')
+    updateUpdateInfo(): void {
+        const date = new Date()
+        this.lastUpdateList =
+            '' + date.getHours() + ':' + date.getMinutes() + ''
     }
 
     async createList(): Promise<void> {
@@ -200,12 +234,55 @@ export default class ApplicationNavigationBar extends Vue {
                 this.BASE_URL + '/lists',
                 listData
             )
+            this.$bvToast.toast(
+                'Your Todo-List "' + listData.name + '" was created.',
+                {
+                    title: 'List Created',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
+            )
         } catch (error) {}
 
         // Reset Dialog
         this.newListName = ''
         this.newListColor = 'primary'
         this.newListIcon = 'check-circle-fill'
+    }
+
+    /**
+     * Select a list for deletion.
+     *
+     * @param list {TodoList} the list to delete
+     */
+    selectListToDelete(list: TodoList): void {
+        this.listToDelete = list
+    }
+
+    /**
+     * Apply the delete operation of the selected list.
+     */
+    async deleteList(): Promise<void> {
+        try {
+            this.todoLists = await this.$axios.$delete(
+                this.BASE_URL +
+                    '/lists/' +
+                    encodeURIComponent(this.listToDelete.sortKey.split('#')[1])
+            )
+            this.$bvToast.toast(
+                'Successfully deleted List "' + this.listToDelete.name + '".',
+                {
+                    title: 'List Deleted',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
+            )
+            await this.$router.push('/')
+        } catch (error) {}
     }
 }
 </script>
@@ -231,5 +308,23 @@ a:hover {
     display: block;
     margin: 5px 0;
     padding: 5px;
+}
+
+.update-label {
+    font-size: 0.8rem;
+    color: gray;
+}
+
+.update-label > a {
+    color: gray;
+}
+
+.update-label > a:hover {
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

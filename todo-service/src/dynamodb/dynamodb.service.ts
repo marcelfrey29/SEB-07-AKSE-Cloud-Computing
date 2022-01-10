@@ -115,7 +115,7 @@ export class DynamodbService {
      * @return {TodoElement[]} the task in the given list
      */
     async getTodosOfList(partitionQuery: string): Promise<TodoElement[]> {
-        this.logger.log('Querying all tasks in the list' + partitionQuery);
+        this.logger.log('Querying all tasks in the list ' + partitionQuery);
 
         const queryListsCommand = new QueryCommand({
             KeyConditionExpression: '#partitionKey = :partitionKey',
@@ -339,5 +339,46 @@ export class DynamodbService {
             );
         }
         throw new Error('Query error or too many todos.');
+    }
+
+    /**
+     * Delete a list of a user.
+     *
+     * @param userId {string} the ID of the list owner
+     * @param listId {string} the ID of the list to delete
+     * @return {void}
+     */
+    async deleteListOfUser(userId: string, listId: string): Promise<void> {
+        this.logger.log('Deleting list ' + listId + ' of user ' + userId);
+
+        const deleteListCommand = new DeleteItemCommand({
+            Key: marshall({
+                partitionKey: userId,
+                sortKey: listId,
+            }),
+            ConditionExpression:
+                'partitionKey = :partitionKey AND sortKey = :sortKey',
+            ExpressionAttributeValues: marshall({
+                ':partitionKey': userId,
+                ':sortKey': listId,
+            }),
+            TableName: this.TABLE_NAME,
+            ReturnConsumedCapacity: 'TOTAL',
+        });
+
+        try {
+            const deleteData = await this.dynamoDBClient.send(
+                deleteListCommand,
+            );
+            this.logger.log(
+                'Deleted list from DynamoDB. (RequestID: ' +
+                    deleteData.$metadata.requestId +
+                    ', capacity_units: ' +
+                    deleteData.ConsumedCapacity.CapacityUnits +
+                    ')',
+            );
+        } catch (error) {
+            this.logger.warn('Error while deleting list in DynamoDB: ' + error);
+        }
     }
 }

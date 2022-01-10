@@ -7,5 +7,6 @@ import { DynamodbModule } from '../dynamodb/dynamodb.module';
     imports: [DynamodbModule],
     providers: [TodosService],
     controllers: [TodosController],
+    exports: [TodosService],
 })
 export class TodosModule {}

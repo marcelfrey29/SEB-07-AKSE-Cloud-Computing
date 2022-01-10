@@ -80,6 +80,16 @@ export default class List extends Vue {
                 this.BASE_URL + '/todos/' + this.listId,
                 todoData
             )
+            this.$bvToast.toast(
+                'Your Todo "' + todoData.title + '" was created.',
+                {
+                    title: 'Todo Created',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
+            )
         } catch (error) {}
     }
 
@@ -92,6 +102,16 @@ export default class List extends Vue {
                     '/todo/' +
                     todoData.sortKey?.split('#')[1],
                 todoData
+            )
+            this.$bvToast.toast(
+                'Your Todo "' + todoData.title + '" was updated.',
+                {
+                    title: 'Todo Updated',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
             )
         } catch (error) {}
     }
@@ -107,6 +127,20 @@ export default class List extends Vue {
                     todoData.sortKey?.split('#')[1],
                 todoData
             )
+            this.$bvToast.toast(
+                'Your Todo "' +
+                    todoData.title +
+                    '" was marked as ' +
+                    (todoData.isDone ? '"Done"' : '"Not Done"') +
+                    '.',
+                {
+                    title: 'Todo: ' + (todoData.isDone ? 'Done' : 'Not Done'),
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
+            )
         } catch (error) {}
     }
 
@@ -118,6 +152,16 @@ export default class List extends Vue {
                     this.listId +
                     '/todo/' +
                     todoData.sortKey?.split('#')[1]
+            )
+            this.$bvToast.toast(
+                'Your Todo "' + todoData.title + '" was deleted.',
+                {
+                    title: 'Todo Deleted',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
             )
         } catch (error) {}
     }

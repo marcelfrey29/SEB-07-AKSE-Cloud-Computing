@@ -1,4 +1,4 @@
-FROM jboss/keycloak
+FROM jboss/keycloak:15.0.2
 
 # Switch to root to install packages
 USER root

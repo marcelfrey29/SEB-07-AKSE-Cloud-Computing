@@ -13,8 +13,29 @@ stages:
 
 # Variables
 variables:
+  # GitLab
+  # By default, GitLab runs "git clean" after checkout, which deletes all untracked and ignored files...
+  # This deletes "cache" and "artifacts" directories, which then cause problems...
+  #     - Cache is useless, because the extracted cache is immediately deleted
+  #     - Artifacts can't be accessed, because the injected /dist directory is deleted
+  GIT_CLEAN_FLAGS: none
+  # Terraform
   TF_ROOT: ${CI_PROJECT_DIR}/terraform/workspaces/aws
   TF_ADDRESS: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/terraform/state/aws-prod
+  # Cache
+  FRONTEND_CACHE_NODE_MODULES_KEY: "frontend-node-modules-cache"
+  FRONTEND_CACHE_NODE_MODULES_PATH: "todo-frontend/node_modules"
+  FRONTEND_CACHE_NPM_KEY: "frontend-npm-cache"
+  FRONTEND_CACHE_NPM_PATH: "todo-frontend/.npm"
+  BACKEND_CACHE_NODE_MODULES_KEY: "backend-node-modules-cache"
+  BACKEND_CACHE_NODE_MODULES_PATH: "todo-service/node_modules"
+  BACKEND_CACHE_NPM_KEY: "backend-npm-cache"
+  BACKEND_CACHE_NPM_PATH: "todo-service/.npm"
+  INFRASTRUCTURE_CACHE_TERRAFORM_KEY: "terraform-cache-aws-prod"
+  INFRASTRUCTURE_CACHE_TERRAFORM_PATH: ${TF_ROOT}/.terraform
+  # Artefacts
+  FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
+  BACKEND_ARTEFACT_DIST_FOLDER_PATH: "todo-service/dist"
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -22,143 +43,151 @@ variables:
 
 .frontend-base:
   extends: .base
-  image: "node:16-alpine"
+  image: "node:16.13.0-bullseye"
   # Cache only works for directories inside the project!
   # Caching the same directory in different projects can be realized by different cache-keys
   # The cache path has to be relative to the root directory
   cache:
-    - key: $CI_COMMIT_REF_SLUG-frontend-node-modules-cache
+    - key: ${FRONTEND_CACHE_NODE_MODULES_KEY}
       paths:
-        - "todo-frontend/node_modules"
-    - key: $CI_COMMIT_REF_SLUG-frontend-npm-cache
+        - ${FRONTEND_CACHE_NODE_MODULES_PATH}
+    - key: ${FRONTEND_CACHE_NPM_KEY}
       paths:
-        - "todo-frontend/.npm"
-    - key: frontend-deploy-files
-      paths:
-        - "todo-frontend/dist"
+        - ${FRONTEND_CACHE_NPM_PATH}
   before_script:
     - cd todo-frontend
+    - npm set timeout=600000
+    - echo "Set npm timeout to 10 min."
 
 .backend-base:
   extends: .base
-  image: "node:16-alpine"
+  image: "node:16.13.0-alpine"
   cache:
-    - key: $CI_COMMIT_REF_SLUG-backend-node-modules-cache
+    - key: ${BACKEND_CACHE_NODE_MODULES_KEY}
       paths:
-        - "todo-service/node_modules"
-    - key: $CI_COMMIT_REF_SLUG-backend-npm-cache
+        - ${BACKEND_CACHE_NODE_MODULES_PATH}
+    - key: ${BACKEND_CACHE_NPM_KEY}
       paths:
-        - "todo-service/.npm"
-    - key: backend-deploy-files
-      paths:
-        - "todo-service/dist"
+        - ${BACKEND_CACHE_NPM_PATH}
   before_script:
     - cd todo-service
+    - npm set timeout=600000
+    - echo "Set npm timeout to 10 min."
 
 .package-base:
   extends: .base
-  image: "docker"
-  cache:
-    - key: backend-deploy-files
-      paths:
-        - "todo-service/dist"
+  image: "docker:20.10.10"
 
 .infrastructure-base:
   extends: .base
   image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
   cache:
-    - key: terraform-cache-aws-prod
+    - key: ${INFRASTRUCTURE_CACHE_TERRAFORM_KEY}
       paths:
-        - $TF_ROOT/.terraform
-    - key: frontend-deploy-files
-      paths:
-        - "todo-frontend/dist"
+        - ${INFRASTRUCTURE_CACHE_TERRAFORM_PATH}
   before_script:
     - cd $TF_ROOT
 
 # Frontend
-Setup Frontend:
-  extends: .frontend-base
-  stage: setup
-  needs: [ ]
-  script:
-    - npm ci --cache .npm
-    - echo "Installed Dependencies."
-
 Build Frontend:
   extends: .frontend-base
   stage: build
-  needs:
-    - Setup Frontend
+  needs: [ ]
+  only:
+    changes:
+      - todo-frontend/**/*
   script:
-    - npm run generate
+    - npm ci --cache .npm --prefer-offline
+    - echo "Installed Dependencies."
+    - npm run generate:dev
     - echo "Build complete."
+  # Use artefacts to pass artifacts from one job to another (e.g. the /dist folder).
+  # Don't use "cache" for this use case!
+  # Artifacts are only passed to the next stage by default, so there is no need to import them then.
+  # If the artifact is needed two plus stages later, this does not work.dependencies:
+  # In this case, we need to tell GitLab to download the artifacts.dependencies:
+  # To do so, we need to specify the 'dependencies' keyword in that later job and reference the job that is generating the artefact.
+  # Path are relative to the project root.
+  artifacts:
+    paths:
+      - ${FRONTEND_ARTEFACT_DIST_FOLDER_PATH}
+    expire_in: 60 min
 
 Test Frontend:
   extends: .frontend-base
   stage: test
   needs:
     - Build Frontend
+  only:
+    changes:
+      - todo-frontend/**/*
   script:
-    - npm run test
+    - npm run test:unit
     - echo "Unit Tests complete."
-    - npm run lint:check:style
+    - npm run lint:prettier:check
     - echo "Prettier Checks complete."
-    - npm run lint:check:js
+    - npm run lint:eslint:check
     - echo "ESLint Checks complete."
 
 # TodoService
-Setup Todo Service:
+Build Todo-Service:
   extends: .backend-base
-  stage: setup
+  stage: build
   needs: [ ]
+  only:
+    changes:
+      - todo-service/**/*
   script:
     - npm ci --cache .npm
     - echo "Installed Dependencies."
-
-Build Todo Service:
-  extends: .backend-base
-  stage: build
-  needs:
-    - Setup Todo Service
-  script:
     - npm run build
     - echo "Build complete."
+  artifacts:
+    paths:
+      - ${BACKEND_ARTEFACT_DIST_FOLDER_PATH}
+    expire_in: 60 min
 
-Test Todo Service:
+Test Todo-Service:
   extends: .backend-base
   stage: test
   needs:
-    - Build Todo Service
+    - Build Todo-Service
+  only:
+    changes:
+      - todo-service/**/*
   script:
-    - npm run test
+    - npm run test:unit
     - echo "Unit Tests complete."
-    - npm run format:verify
+    - npm run lint:prettier:check
     - echo "Prettier Checks complete."
+    - npm run lint:eslint:check
+    - echo "ESLint Checks complete."
 
-Package Todo Service:
+Package Todo-Service:
   extends: .package-base
   stage: package
   needs:
-    - Test Todo Service
+    - Build Todo-Service
+    - Test Todo-Service
+  # With dependencies, we can define jobs we want to download artifacts from.
+  # This is required if the artifacts are not generated in the previous stage.
+  # If a job is defines as dependency, it has to be added to 'needs' (needed jobs) as well
+  # In this case, we download the artifact from the 'Build Todo-Service' job, which is 2 stages before
+  dependencies:
+    - Build Todo-Service
+  #  only:
+  #    changes:
+  #      - todo-service/**/*
   script:
+    - echo "TODO..."
     - cd todo-service
+    - ls -la
+    - cd dist
+    - ls -la
     - echo "TODO..."
     - echo "Packaged Todo-Service."
     - echo "TODO..."
     - echo "Uploaded Todo-Service."
-
-# Keycloak
-Package Keycloak:
-  extends: .package-base
-  stage: package
-  needs: [ ]
-  script:
-    - cd keycloak
-    - echo "TODO..."
-    - echo "Packaged Keycloak."
-    - echo "TODO..."
-    - echo "Uploaded Keycloak."
 
 # Terraform
 Initialize Terraform:
@@ -174,6 +203,9 @@ Validate Terraform:
   stage: test
   needs:
     - Initialize Terraform
+  only:
+    changes:
+      - terraform/**/*
   script:
     - gitlab-terraform validate
     - echo "Validated Terraform Code."
@@ -184,8 +216,10 @@ Plan Deployment:
   needs:
     - Validate Terraform
     - Build Frontend
-    - Package Todo Service
-    - Package Keycloak
+    - Test Frontend
+    - Package Todo-Service
+  dependencies:
+    - Build Frontend
   script:
     - gitlab-terraform plan
     - gitlab-terraform plan-json
@@ -203,6 +237,13 @@ Plan Deployment:
     - cd dist
     - pwd
     - ls -la
+    - cat index.html
+    - echo "TODO FRONTEND DONE"
+    - cd ../../todo-service
+    - ls -la
+    - cd dist
+    - ls -la
+    - echo "TODO SERVICE DONE"
     - echo "Planning for deployment finished."
   artifacts:
     name: plan
@@ -215,9 +256,13 @@ Deployment:
   extends: .infrastructure-base
   stage: deploy
   needs:
+    - Build Frontend
     - Plan Deployment
+  dependencies:
+    - Build Frontend
   script:
-    - gitlab-terraform apply
+    #    - gitlab-terraform apply
+    - echo "TODO..."
     - cd ../../../todo-frontend/dist
     - ls -la
     - echo "Deploy complete."
@@ -226,7 +271,7 @@ Deployment:
   #  rules:
   #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   #      when: manual
-  when: manual
+#  when: manual
 
 Destroy:
   extends: .infrastructure-base

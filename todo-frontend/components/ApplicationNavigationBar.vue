@@ -12,7 +12,11 @@
         <hr />
 
         <!-- Lists -->
-        <b-card-title>Lists</b-card-title>
+        <b-card-title class="mb-0">Lists</b-card-title>
+        <p class="mt-0 update-label">
+            Last Updated: {{ lastUpdateList }} &CenterDot;
+            <a class="hover cursor-pointer" @click="getLists">Update</a>
+        </p>
 
         <b-card-sub-title v-if="todoLists.length <= 0" class="mt-3">
             You don't have a list yet. Create a new list by clicking the button.
@@ -149,31 +153,6 @@
                 </b-form-radio-group>
             </b-form-group>
         </b-modal>
-
-        <!--        <hr />-->
-
-        <!-- More -->
-        <!--        <b-card-title>More</b-card-title>-->
-        <!--        <div>-->
-        <!--            <NuxtLink-->
-        <!--                to="/account"-->
-        <!--                active-class="selected-list"-->
-        <!--                class="list-link"-->
-        <!--            >-->
-        <!--                <BIconPersonCircle></BIconPersonCircle>-->
-        <!--                Account-->
-        <!--            </NuxtLink>-->
-        <!--        </div>-->
-        <!--        <div>-->
-        <!--            <NuxtLink-->
-        <!--                to="/settings"-->
-        <!--                active-class="selected-list"-->
-        <!--                class="list-link"-->
-        <!--            >-->
-        <!--                <BIconGearFill></BIconGearFill>-->
-        <!--                Settings-->
-        <!--            </NuxtLink>-->
-        <!--        </div>-->
     </div>
 </template>
 
@@ -191,6 +170,7 @@ import {
     BIconCheckCircleFill,
     BIconTrashFill,
 } from 'bootstrap-vue/src/icons'
+import { Watch } from 'vue-property-decorator'
 import { TodoList } from '~/types/TodoList.interface'
 
 /**
@@ -214,6 +194,7 @@ export default class ApplicationNavigationBar extends Vue {
     private readonly BASE_URL =
         process.env.NUXT_ENV_TODO_SERVICE_URL ?? 'http://localhost:4000'
 
+    private lastUpdateList = 'Never'
     private newListName = ''
     private newListColor = 'primary'
     private newListIcon = 'check-circle-fill'
@@ -226,9 +207,20 @@ export default class ApplicationNavigationBar extends Vue {
     }
 
     async mounted(): Promise<void> {
+        await this.getLists()
+    }
+
+    async getLists(): Promise<void> {
         try {
             this.todoLists = await this.$axios.$get(this.BASE_URL + '/lists')
         } catch (error) {}
+    }
+
+    @Watch('todoLists')
+    updateUpdateInfo(): void {
+        const date = new Date()
+        this.lastUpdateList =
+            '' + date.getHours() + ':' + date.getMinutes() + ''
     }
 
     async createList(): Promise<void> {
@@ -241,6 +233,16 @@ export default class ApplicationNavigationBar extends Vue {
             this.todoLists = await this.$axios.$post(
                 this.BASE_URL + '/lists',
                 listData
+            )
+            this.$bvToast.toast(
+                'Your Todo-List "' + listData.name + '" was created.',
+                {
+                    title: 'List Created',
+                    autoHideDelay: 7500,
+                    appendToast: true,
+                    variant: 'success',
+                    solid: true,
+                }
             )
         } catch (error) {}
 
@@ -306,5 +308,23 @@ a:hover {
     display: block;
     margin: 5px 0;
     padding: 5px;
+}
+
+.update-label {
+    font-size: 0.8rem;
+    color: gray;
+}
+
+.update-label > a {
+    color: gray;
+}
+
+.update-label > a:hover {
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 </style>

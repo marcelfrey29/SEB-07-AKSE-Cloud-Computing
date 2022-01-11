@@ -25,6 +25,12 @@ variable "public_cidr_block" {
     default     = "0.0.0.0/0"
 }
 
+variable "keypair_public_key" {
+    description = "The public key to access the EC2 Instance"
+    type        = string
+    default     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCbPiHyfEuQ/QlGs5sarVyRGtrVUO3ol4uaQFCCsuDBaSjEoCTPce6oULSMA7X5ftXLJZVCaah3cQWm433ADM+rdxKXILz7iq/UOAMSos3b0ruFMts6BUJyVX3spDvI8xaWLZ4HzsHcobr3Qc21Ye5RZXmn6GL2B1Sz8lo2uRo+fKn2Uv1cjwEbBkO53Fv+d8380m/aIjLiY2ttgHtojJTFxbreHcZkczCx1GIX3XJtYdbjKVnp+eVEAa3FzcbO5tjAmicHHIrg+Rrj0KBFA6VDTSG0Wrksomm3+QFEjHiW4CrTTh9dSZH8Le6D74VPBCcQSemnGrL9mMvgLmOj8ngX9jASTwr6ttCtRwoanqLD9QNJxzlvmJAJJuP17Twf/h95SW3em+dHIK1qMSC80YA2LebeOI33LAGQWZLXUHIehbjkuQLG77gymjz58FOaCTtZbcdCXHnld+mIGIs0yRAPwReDbMtMK9DGlnIvGyFrjb20+jRbhHqW47aJcCY5ttk= noname"
+}
+
 variable "s3_webapp_bucket_name" {
     description = "The name of the S3 Bucket of the WebApp"
     type        = string

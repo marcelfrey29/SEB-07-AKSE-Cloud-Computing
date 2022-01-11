@@ -15,6 +15,7 @@ resource "aws_instance" "container_host" {
     user_data                   = templatefile("${path.module}/ec2-user-data/container_host.tftpl", {
         cluster_name = local.cluster_name
     })
+    key_name                    = aws_key_pair.key.key_name
 
     root_block_device {
         volume_size           = 20
@@ -33,6 +34,12 @@ resource "aws_instance" "container_host" {
     })
 }
 
+resource "aws_key_pair" "key" {
+    key_name   = "EC2-Container-Host-Key-Pair"
+    public_key = var.keypair_public_key
+    tags       = var.aws_tags
+}
+
 // Security Group (Firewall) for the EC2 Container Hosts
 resource "aws_security_group" "container_host" {
     name        = "ECS Container Host Security Group"
@@ -49,6 +56,18 @@ resource "aws_security_group_rule" "container_host_egress_allow_all" {
     protocol          = "tcp"
     from_port         = 0
     to_port           = 65535
+    cidr_blocks       = [var.public_cidr_block]
+}
+
+// SSH Ingress Rule
+// INFO: This rule should only be enabled while working with SSH
+resource "aws_security_group_rule" "ssh_ingress_rule" {
+    description       = "Allow SSH access to the Instance"
+    type              = "ingress"
+    security_group_id = aws_security_group.container_host.id
+    protocol          = "tcp"
+    from_port         = 22
+    to_port           = 22
     cidr_blocks       = [var.public_cidr_block]
 }
 
@@ -95,6 +114,14 @@ resource "aws_iam_role" "container_host" {
 resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceForEC2Role" {
     role       = aws_iam_role.container_host.id
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+}
+
+// Allow access to DynamoDB table
+resource "aws_iam_role_policy" "container_host_dynamodb" {
+    role   = aws_iam_role.container_host.id
+    policy = templatefile("${path.module}/policies/ecs-task-backend-service-execution-role.tftpl", {
+        dynamodb_table = aws_dynamodb_table.todo_db.arn
+    })
 }
 
 // Required to pass an IAM Role to an EC2 Instance.

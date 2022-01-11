@@ -85,7 +85,10 @@ resource "aws_ecs_task_definition" "backend_service" {
     family                = local.ecs_service_backend_family_name
     container_definitions = templatefile("${path.module}/ecs-tasks/backend-service-container.tftpl", {
         server_port            = var.todo_service_port
-        keycloak_url           = "${aws_instance.container_host.public_dns}:${var.keycloak_port}",
+        // IMPORTANT: If the "server_environment" is NOT "DEVELOPMENT", then the Environment Variable "KEYCLOAK_REALM_PUBLIC_KEY" has NOT to be set!
+        server_environment     = "PRODUCTION"
+        // Important: The Keycloak URL has to end with "/auth" (see Backend-Code)
+        keycloak_url           = "http://${aws_instance.container_host.public_dns}:${var.keycloak_port}/auth",
         keycloak_realm         = var.keycloak_realm,
         keycloak_client_id     = var.keycloak_client_id,
         keycloak_client_secret = var.keycloak_client_secret,
@@ -112,12 +115,4 @@ resource "aws_iam_role" "backend_service_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "backend_service_AmazonECSTaskExecutionRolePolicy" {
     role       = aws_iam_role.backend_service_task_execution_role.id
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-// Allow access to DynamoDB table
-resource "aws_iam_role_policy" "backend_service_task_execution_role" {
-    role   = aws_iam_role.backend_service_task_execution_role.id
-    policy = templatefile("${path.module}/policies/ecs-task-backend-service-execution-role.tftpl", {
-        dynamodb_table = aws_dynamodb_table.todo_db.arn
-    })
 }

@@ -41,9 +41,15 @@ import { TodosModule } from './todos/todos.module';
                 authServerUrl:
                     configService.get<string>('KEYCLOAK_URL') ??
                     'NO_KEYCLOAK_URL_PROVIDED',
-                realmPublicKey:
-                    configService.get<string>('KEYCLOAK_REALM_PUBLIC_KEY') ??
-                    'NO_REALM_PUBLIC_KEY_PROVIDED',
+
+                // If ONLINE Validation is used, the "KEYCLOAK_REALM_PUBLIC_KEY" has to be "undefined"
+                // This can be archived, by NOT passing a value to the container.
+                // Assigning a random value does not work!
+                // If a value is passed, the library performs OFFLINE validation which is not what we want.
+                // If a random value is assigned, the library takes this value as public key and ignores our setting to query the key from Keycloak
+                realmPublicKey: configService.get<string>(
+                    'KEYCLOAK_REALM_PUBLIC_KEY',
+                ),
 
                 // Configure the Realm
                 realm:

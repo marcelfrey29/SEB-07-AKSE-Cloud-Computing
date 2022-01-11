@@ -1,73 +1,98 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# Todo-Service - Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The Todo-Service is the backend part of the Todo-Application.<br>
+It is responsible for providing all business logic.<br>
+The Backend provides REST-Endpoints for the [Frontend](../todo-frontend/README.md) Application.<br>
+Requests need an `Authorization`-Header, because the JWT contains the user information.<br>
+The identity of the user is then validated against [Keycloak](../keycloak/README.md).<br>
+All Todo-Lists and Todos are stored in DynamoDB.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Core Technologies
 
-## Description
+- Node.js **16** (never versions are not supported, e.g. Node 17 is not working)
+- [Nest.js](https://github.com/nestjs/nest)
+- Nest-Keycloak-Connect
+- AWS SDK (DynamoDB, DynamoDB-Utils)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Environment Variables
 
-## Installation
+- Because the application is deployed as container, all environment variables have to passed to the container on startup
+
+| Key                          | Description                                                                                                                                                   | Supported Values                                                                                 | Default |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------|
+| `SERVER_ENVIRONMENT_SETTING` | The environment where the application is running.<br>Required to determine the correct user validation strategy.<br>See [Keycloak](../keycloak/README.md)     | `DEVELOPMENT`, `PRODUCTION` or ` `                                                               | ` `     |
+| `SERVER_PORT`                | The port where Nest.js starts the server                                                                                                                      | `0` to `65535`                                                                                   | `4000`  |
+| `KEYCLOAK_URL`               | The URL of the Keycloak-Server                                                                                                                                | ` `                                                                                              | ` `     |
+| `KEYCLOAK_REALM`             | The realm for the application                                                                                                                                 | ` `                                                                                              | ` `     |
+| `KEYCLOAK_CLIENT_ID`         | The client ID of the application                                                                                                                              | ` `                                                                                              | ` `     |
+| `KEYCLOAK_CLIENT_SECRET`     | The client secret of the application                                                                                                                          | ` `                                                                                              | ` `     |
+| `KEYCLOAK_REALM_PUBLIC_KEY`  | The public key of the Keycloak realm<br>Required for local development                                                                                        | ` `                                                                                              | ` `     |
+| `DYNAMODB_REGION`            | The Region where the DynamoDB Table is located                                                                                                                | An supported [AWS Region](https://aws.amazon.com/de/about-aws/global-infrastructure/regions_az/) | ` `     |
+| `REGION`                     | The Region where the DynamoDB Table is located                                                                                                                | An supported [AWS Region](https://aws.amazon.com/de/about-aws/global-infrastructure/regions_az/) | ` `     |
+| `DYNAMODB_ENDPOINT`          | The DynamoDB Endpoint<br>Local: http://localhost:8000 <br>Local Docker: http://todo-db:8000 <br>AWS EU-Central-1: https://dynamodb.eu-central-1.amazonaws.com | ` `                                                                                              | ` `     |
+| `DYNAMODB_TABLE_NAME`        | The name of the DynamoDB table                                                                                                                                | ` `                                                                                              | ` `     |
+| `AWS_ACCESS_KEY_ID`          | The AWS Access Key ID<br> Only for local development, can be mocked                                                                                           | ` `                                                                                              | ` `     |
+| `AWS_SECRET_ACCESS_KEY`      | The AWS Access Key Secret<br> Only for local development, can be mocked                                                                                       | ` `                                                                                              | ` `     |
+
+## REST Endpoints
+
+| Endpoint                      | Public | Methods  | Description                                                                                |
+|-------------------------------|--------|----------|--------------------------------------------------------------------------------------------|
+| `/info`                       | ❌      | `GET`    | Get a status message<br>No app functionality                                               |
+| `/lists`                      | ❌      | `GET`    | Get all Todo-Lists of the user                                                             |
+| `/lists`                      | ❌      | `POST`   | Create a new Todo-List                                                                     |
+| `/lists/:listid`              | ❌      | `DELETE` | Delete the Todo-List with the ID `listid`<br>This also deletes all Todos in that Todo-List |
+| `/todos/:listid`              | ❌      | `GET`    | Get all Todos of the Todo-List with ID `listid`                                            |
+| `/todos/:listid`              | ❌      | `POST`   | Create a new Todo in the Todo-List with ID `listid`                                        |
+| `/todos/:listid/todo/:todoid` | ❌      | `PUT`    | Update the existing Todo with ID `todoid` in the Todo-List with ID `listid`                |
+| `/todos/:listid/todo/:todoid` | ❌      | `DELETE` | Delete the existing Todo with ID `todoid` in the Todo-List with ID `listid`                |
+
+## Local Development
+
+- **Running the main `docker-compose.yml` file is enough to run and develop the backend** (_Recommended_)
+    - No local Node.js installation is required
+    - All dependencies are installed inside the container
+    - All relevant files are automatically mounted into the container
+    - The correct script runs automatically
+- If you want to work outside of Docker, you can use following commands:
+    - **If you run the app outside of Docker, you have to pass all required environment variables manually**
+    - Also, make sure that all Ports are forwarded correctly
 
 ```bash
+# Install dependencies
 $ npm install
-```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
+# Development
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
+## Build for Production (AWS)
 
-```bash
-# unit tests
-$ npm run test
+- The Backend-Service is deployed as container.
+- **Building for production currently happens outside of Docker**
+    - Node.js needs to be installed
 
-# e2e tests
-$ npm run test:e2e
+```shell
+# Install dependencies
+$ npm install
 
-# test coverage
-$ npm run test:cov
+# Build project
+$ npm run build
 ```
 
-## Support
+- After building the backend, we need to build the Docker Image and push it to the Elastic Container Registry (ECR)
+    - Replace `ACCOUNT_NUMBER` with the account number of your AWS Account
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```shell
+# Login to ECR with a temporary login
+$ aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ACCOUNT_NUMBER.dkr.ecr.eu-central-1.amazonaws.com
 
-## Stay in touch
+# Build Docker Image (Important: Use the Production Dockerfile!)
+$ docker build -f Production.Dockerfile -t akse-todo-service .
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Tag Image
+$ docker tag akse-todo-service:latest ACCOUNT_NUMBER.dkr.ecr.eu-central-1.amazonaws.com/akse-todo-service:latest
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+# Push the Image to ECR
+$ docker push ACCOUNT_NUMBER.dkr.ecr.eu-central-1.amazonaws.com/akse-todo-service:latest
+```

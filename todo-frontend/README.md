@@ -1,68 +1,59 @@
-# todo-frontend
+# Todo Application - Frontend
 
-## Build Setup
+The Frontend-Application is a Single Page Application (SPA) that provides the User Interface of the Todo-Application.<br>
+All data have to be queried and send to the [Backend Service](../todo-service/README.md).<br>
+Every request needs to contain the `Authorization` Header.<br>
+The frontend is responsible for redirecting the user to [Keycloak](../keycloak/README.md) and handle the redirect.<br>
+
+## Core Technologies
+
+- Node.js **16** (never versions are not supported, e.g. Node 17 is not working)
+- [Nuxt.js](https://nuxtjs.org/) based on Vue.js
+- Nuxt Auth
+- BootstrapVue and Bootstrap
+
+## Environment Variables
+
+- Because the application is deployed by uploading static files to S3, the environment variables have to be injected on build-time
+- Environment variables need to start with `NUXT_ENV_` that they are recognized by Nuxt
+- See the `dev.env`, `production.env` and `TEMPLATE.env` files
+
+| Key                              | Description                                                                                              | Supported Values | Default |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|------------------|---------|
+| `NUXT_ENV_KEYCLOAK_HOST`         | The URL of the Keycloak-Server                                                                           | ` `              | ` `     |
+| `NUXT_ENV_KEYCLOAK_REALM`        | The Realm for the application                                                                            | ` `              | ` `     |
+| `NUXT_ENV_KEYCLOAK_REDIRECT_URI` | The URL of the Frontend (e.g. of this application)<br>Keycloak will redirect to this address after login | ` `              | ` `     |
+| `NUXT_ENV_KEYCLOAK_CLIENT_ID`    | The Client ID of the application                                                                         | ` `              | ` `     |
+| `NUXT_ENV_TODO_SERVICE_URL`      | The URL of the Backend-Service                                                                           | ` `              | ` `     |
+
+## Local Development
+
+- **Running the main `docker-compose.yml` file is enough to run and develop the frontend** (_Recommended_)
+    - No local Node.js installation is required
+    - All dependencies are installed inside the container
+    - All relevant files are automatically mounted into the container
+    - The correct script runs automatically
+- If you want to work outside of Docker, you can use following commands:
 
 ```bash
-# install dependencies
+# Install dependencies
 $ npm install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
+# Start Development Server
+$ npm run start:dev
 ```
 
-For detailed explanation on how things work, check out the [documentation](https://nuxtjs.org).
+## Build for Production (AWS)
 
-## Special Directories
+- The Frontend-Application is hosted as a Static Website on S3
+- **Building for production currently happens outside of Docker**
+    - Node.js needs to be installed
+- **In this step only the static assets are generated - The deployment (upload to S3) is done with Terraform**
 
-You can create the following extra directories, some of which have special behaviors. Only `pages` is required; you can delete them if you don't want to use their functionality.
+```bash
+# Install dependencies
+$ npm install
 
-### `assets`
-
-The assets directory contains your uncompiled assets such as Stylus or Sass files, images, or fonts.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/assets).
-
-### `components`
-
-The components directory contains your Vue.js components. Components make up the different parts of your page and can be reused and imported into your pages, layouts and even other components.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/components).
-
-### `layouts`
-
-Layouts are a great help when you want to change the look and feel of your Nuxt app, whether you want to include a sidebar or have distinct layouts for mobile and desktop.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/layouts).
-
-### `pages`
-
-This directory contains your application views and routes. Nuxt will read all the `*.vue` files inside this directory and setup Vue Router automatically.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/get-started/routing).
-
-### `plugins`
-
-The plugins directory contains JavaScript plugins that you want to run before instantiating the root Vue.js Application. This is the place to add Vue plugins and to inject functions or constants. Every time you need to use `Vue.use()`, you should create a file in `plugins/` and add its path to plugins in `nuxt.config.js`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/plugins).
-
-### `static`
-
-This directory contains your static files. Each file inside this directory is mapped to `/`.
-
-Example: `/static/robots.txt` is mapped as `/robots.txt`.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/static).
-
-### `store`
-
-This directory contains your Vuex store files. Creating a file in this directory automatically activates Vuex.
-
-More information about the usage of this directory in [the documentation](https://nuxtjs.org/docs/2.x/directory-structure/store).
+# Generate Static Files
+$ npm run generate:prod
+```

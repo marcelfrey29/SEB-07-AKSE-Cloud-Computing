@@ -116,11 +116,3 @@ resource "aws_iam_role_policy_attachment" "backend_service_AmazonECSTaskExecutio
     role       = aws_iam_role.backend_service_task_execution_role.id
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
-
-// Allow access to DynamoDB table
-resource "aws_iam_role_policy" "backend_service_task_execution_role" {
-    role   = aws_iam_role.backend_service_task_execution_role.id
-    policy = templatefile("${path.module}/policies/ecs-task-backend-service-execution-role.tftpl", {
-        dynamodb_table = aws_dynamodb_table.todo_db.arn
-    })
-}

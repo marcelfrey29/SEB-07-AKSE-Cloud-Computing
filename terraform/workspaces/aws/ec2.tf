@@ -116,6 +116,14 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceForEC2Role" 
     policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
 }
 
+// Allow access to DynamoDB table
+resource "aws_iam_role_policy" "container_host_dynamodb" {
+    role   = aws_iam_role.container_host.id
+    policy = templatefile("${path.module}/policies/ecs-task-backend-service-execution-role.tftpl", {
+        dynamodb_table = aws_dynamodb_table.todo_db.arn
+    })
+}
+
 // Required to pass an IAM Role to an EC2 Instance.
 // See https://docs.aws.amazon.com/de_de/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
 resource "aws_iam_instance_profile" "container_host" {

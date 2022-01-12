@@ -76,7 +76,11 @@ variables:
 
 .package-base:
   extends: .base
-  image: "docker:20.10.10"
+  image: "amazon/aws-cli:2.4.10"
+  before_script:
+    - amazon-linux-extras install docker -y
+    - aws --version
+    - docker -v
 
 .infrastructure-base:
   extends: .base
@@ -175,19 +179,16 @@ Package Todo-Service:
   # In this case, we download the artifact from the 'Build Todo-Service' job, which is 2 stages before
   dependencies:
     - Build Todo-Service
-  #  only:
-  #    changes:
-  #      - todo-service/**/*
   script:
-    - echo "TODO..."
     - cd todo-service
-    - ls -la
-    - cd dist
-    - ls -la
-    - echo "TODO..."
-    - echo "Packaged Todo-Service."
-    - echo "TODO..."
-    - echo "Uploaded Todo-Service."
+    - docker build -f Production.Dockerfile -t akse-todo-service .
+    - echo "Build Docker Image."
+    - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${AWS_DOCKER_REGISTRY_URL}
+    - echo "Loggedin to ECR / Docker"
+    - docker tag akse-todo-service:latest ${AWS_DOCKER_REGISTRY_URL}/akse-todo-service:latest
+    - echo "Tagged Docker Image"
+    - docker push ${AWS_DOCKER_REGISTRY_URL}/akse-todo-service:latest
+    - echo "Pushed Image to ECR."
 
 # Terraform
 Initialize Terraform:
@@ -222,29 +223,10 @@ Plan Deployment:
     - Build Frontend
   script:
     - gitlab-terraform plan
+    - echo "Terraform Plan complete."
     - gitlab-terraform plan-json
-    - pwd
-    - cd ..
-    - pwd
-    - cd ..
-    - pwd
-    - cd ..
-    - pwd
-    - ls -la
-    - cd todo-frontend
-    - pwd
-    - ls -la
-    - cd dist
-    - pwd
-    - ls -la
-    - cat index.html
-    - echo "TODO FRONTEND DONE"
-    - cd ../../todo-service
-    - ls -la
-    - cd dist
-    - ls -la
-    - echo "TODO SERVICE DONE"
-    - echo "Planning for deployment finished."
+    - echo "Generated the JSON output of the Plan"
+    - echo "Complete."
   artifacts:
     name: plan
     paths:
@@ -260,24 +242,21 @@ Deployment:
     - Plan Deployment
   dependencies:
     - Build Frontend
+    - Plan Deployment
   script:
-    #    - gitlab-terraform apply
-    - echo "TODO..."
-    - cd ../../../todo-frontend/dist
-    - ls -la
+    - echo "TODO - Enable Deployment..."
+    # - gitlab-terraform apply
     - echo "Deploy complete."
   environment:
     name: production
-  #  rules:
-  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  #      when: manual
-#  when: manual
+  when: manual
 
 Destroy:
   extends: .infrastructure-base
   stage: cleanup
   script:
-    - gitlab-terraform destroy
+    - echo "TODO - Enable Destroy..."
+    # - gitlab-terraform destroy
     - echo "Destroy complete."
   environment:
     name: production

@@ -76,11 +76,16 @@ variables:
 
 .package-base:
   extends: .base
-  image: "amazon/aws-cli:2.4.10"
+  image:
+    name: "amazon/aws-cli:2.4.10"
+    entrypoint: [ "" ]
   before_script:
+    - echo "Installing Docker"
     - amazon-linux-extras install docker -y
+    - echo "Installed Software Versions..."
     - aws --version
     - docker -v
+    - echo "Docker and the AWS CLI are ready to use."
 
 .infrastructure-base:
   extends: .base

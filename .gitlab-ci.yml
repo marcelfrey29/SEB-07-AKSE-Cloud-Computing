@@ -36,6 +36,9 @@ variables:
   # Artefacts
   FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
   BACKEND_ARTEFACT_DIST_FOLDER_PATH: "todo-service/dist"
+  # Docker
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -178,7 +181,7 @@ Package Todo-Service:
   # See https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker
   # and https://docs.gitlab.com/ee/ci/services/index.html#using-services-with-docker-run-docker-in-docker-side-by-side
   services:
-    - docker:dind
+    - docker:20.10.7-dind
   needs:
     - Build Todo-Service
     - Test Todo-Service
@@ -190,6 +193,9 @@ Package Todo-Service:
     - Build Todo-Service
   script:
     - cd todo-service
+    - echo "Docker Infos..."
+    - docker info
+    - echo "Building Image..."
     - docker build -f Production.Dockerfile -t akse-todo-service .
     - echo "Build Docker Image."
     - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${AWS_DOCKER_REGISTRY_URL}

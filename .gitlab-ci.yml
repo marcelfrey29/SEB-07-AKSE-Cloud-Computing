@@ -36,8 +36,6 @@ variables:
   # Artefacts
   FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
   BACKEND_ARTEFACT_DIST_FOLDER_PATH: "todo-service/dist"
-  # Docker
-  DOCKER_HOST: tcp://docker:2375
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:

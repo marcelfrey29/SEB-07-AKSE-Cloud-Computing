@@ -175,6 +175,10 @@ Test Todo-Service:
 Package Todo-Service:
   extends: .package-base
   stage: package
+  # See https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker
+  # and https://docs.gitlab.com/ee/ci/services/index.html#using-services-with-docker-run-docker-in-docker-side-by-side
+  services:
+    - docker:dind
   needs:
     - Build Todo-Service
     - Test Todo-Service

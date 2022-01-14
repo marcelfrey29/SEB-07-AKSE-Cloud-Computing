@@ -5,7 +5,8 @@ It is responsible for providing all business logic.<br>
 The Backend provides REST-Endpoints for the [Frontend](../todo-frontend/README.md) Application.<br>
 Requests need an `Authorization`-Header, because the JWT contains the user information.<br>
 The identity of the user is then validated against [Keycloak](../keycloak/README.md).<br>
-All Todo-Lists and Todos are stored in DynamoDB.
+All Todo-Lists and Todos are stored in DynamoDB.<br>
+For local development, DynamoDB-Local is used (see below).
 
 ## Core Technologies
 
@@ -20,7 +21,7 @@ All Todo-Lists and Todos are stored in DynamoDB.
 
 | Key                          | Description                                                                                                                                                                                                                          | Supported Values                                                                                 | Default |
 |------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------|---------|
-| `SERVER_ENVIRONMENT_SETTING` | The environment where the application is running.<br>Required to determine the correct user validation strategy.<br>See [Keycloak](../keycloak/README.md)                                                                            | `DEVELOPMENT`, `PRODUCTION` or ` `                                                               | ` `     |
+| `SERVER_ENVIRONMENT_SETTING` | The environment where the application is running.<br>Required to determine the correct user validation strategy.<br>**Only set this variable for local development!**<br>**In production, don't pass a value!**                      | `DEVELOPMENT`                                                                                    | ` `     |
 | `SERVER_PORT`                | The port where Nest.js starts the server                                                                                                                                                                                             | `0` to `65535`                                                                                   | `4000`  |
 | `KEYCLOAK_URL`               | The URL of the Keycloak-Server                                                                                                                                                                                                       | ` `                                                                                              | ` `     |
 | `KEYCLOAK_REALM`             | The realm for the application                                                                                                                                                                                                        | ` `                                                                                              | ` `     |
@@ -96,3 +97,19 @@ $ docker tag akse-todo-service:latest ACCOUNT_NUMBER.dkr.ecr.eu-central-1.amazon
 # Push the Image to ECR
 $ docker push ACCOUNT_NUMBER.dkr.ecr.eu-central-1.amazonaws.com/akse-todo-service:latest
 ```
+
+# DynamoDB
+
+## Core Technologies
+
+- [DynamoDB](https://aws.amazon.com/dynamodb/) (Production)
+- [DynamoDB Local](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html) / [DynamoDB Local Docker Image](https://hub.docker.com/r/amazon/dynamodb-local) (Development)
+
+## Local Development
+
+- **Use the main `docker-compose.yml` file** (_Recommended_)
+
+## Production Environment
+
+- On AWS, DynamoDB is used
+- The DynamoDB Table is managed by Terraform

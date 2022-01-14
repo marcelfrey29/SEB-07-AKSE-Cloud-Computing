@@ -4,7 +4,7 @@ resource "keycloak_openid_client" "todo-service" {
     name        = "Todo Service"
     enabled     = true
     description = "The client for the Nest.js Backend."
-    
+
     access_type = "CONFIDENTIAL"
 }
 

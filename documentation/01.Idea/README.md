@@ -52,15 +52,15 @@
 
 ## Services
 
-Service                | Technology         | Local / Development           | AWS
----------------------- | ------------------ | ----------------------------- | ---------
-Web App (Static)       | Node, Vue.js, Nuxt | Docker<br>Node (later nginx?) | S3<br>---
-Keycloak               | ---                | Docker<br>Keycloak            | Cognito or Keycloak<br>--- or EC2 / ECS
-Todo-Service           | Node, Nest.js      | Docker<br>---                 | EC2 / ECS<br>---
-Todo-DB<br>DynamoDB    | ---                | Docker<br>DynamoDB-local      | Dynamo DB<br>---
-RabbitMQ               | ---                | Docker<br>RabbitMQ            | Amazon MQ (RabbitMQ)<br>---
-Badge-Service          | JVM, Spring Boot   | Docker<br>---                 | EC2 / ECS<br>---
-Badge-DB<br>PostgreSQL | ---                | Docker<br>PostgreSQL          | RDS (PostgreSQL)<br>---
+| Service                | Technology         | Local / Development           | AWS                                     |
+|------------------------|--------------------|-------------------------------|-----------------------------------------|
+| Web App (Static)       | Node, Vue.js, Nuxt | Docker<br>Node (later nginx?) | S3<br>---                               |
+| Keycloak               | ---                | Docker<br>Keycloak            | Cognito or Keycloak<br>--- or EC2 / ECS |
+| Todo-Service           | Node, Nest.js      | Docker<br>---                 | EC2 / ECS<br>---                        |
+| Todo-DB<br>DynamoDB    | ---                | Docker<br>DynamoDB-local      | Dynamo DB<br>---                        |
+| RabbitMQ               | ---                | Docker<br>RabbitMQ            | Amazon MQ (RabbitMQ)<br>---             |
+| Badge-Service          | JVM, Spring Boot   | Docker<br>---                 | EC2 / ECS<br>---                        |
+| Badge-DB<br>PostgreSQL | ---                | Docker<br>PostgreSQL          | RDS (PostgreSQL)<br>---                 |
 
 ## Communication
 

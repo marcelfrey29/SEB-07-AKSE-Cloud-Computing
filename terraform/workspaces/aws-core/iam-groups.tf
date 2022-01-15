@@ -26,9 +26,13 @@ resource "aws_iam_group_policy" "bots" {
                     "iam:UpdateRoleDescription",
                     "iam:UpdateAssumeRolePolicy",
                     "iam:ListAttachedRolePolicies",
+                    "iam:ListInstanceProfiles",
+                    "iam:GetInstanceProfile",
+                    "iam:CreateInstanceProfile",
+                    "iam:DeleteInstanceProfile",
+                    "iam:ListInstanceProfilesForRole",
                     "iam:AddRoleToInstanceProfile",
-                    "iam:RemoveRoleFromInstanceProfile",
-                    "iam:ListInstanceProfilesForRole"
+                    "iam:RemoveRoleFromInstanceProfile"
                 ]
                 Effect   = "Allow"
                 Resource = "*"

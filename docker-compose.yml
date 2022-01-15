@@ -56,6 +56,8 @@ services:
     command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
     volumes:
       - "./.storage/todo-db/data:/home/dynamodblocal/data"
+    ports: # Only required for the Setup-Process
+      - "8000:8000" # After setup, feel free to disable this port-mapping
     networks:
       - backend
     restart: unless-stopped

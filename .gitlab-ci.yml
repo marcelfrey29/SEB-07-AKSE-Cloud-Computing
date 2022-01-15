@@ -237,9 +237,9 @@ Plan Deployment:
   dependencies:
     - Build Frontend
   script:
-    - gitlab-terraform plan
+    - gitlab-terraform plan -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}"
     - echo "Terraform Plan complete."
-    - gitlab-terraform plan-json
+    - gitlab-terraform plan-json -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}"
     - echo "Generated the JSON output of the Plan"
     - echo "Complete."
   artifacts:
@@ -260,7 +260,7 @@ Deployment:
     - Plan Deployment
   script:
     - echo "TODO - Enable Deployment..."
-    # - gitlab-terraform apply # TODO: Enable
+    # - gitlab-terraform apply -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}" # TODO: Enable
     - echo "Deploy complete."
   environment:
     name: production
@@ -271,7 +271,7 @@ Destroy:
   stage: cleanup
   script:
     - echo "TODO - Enable Destroy..."
-    # - gitlab-terraform destroy # TODO: Enable
+    # - gitlab-terraform destroy -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}" # TODO: Enable
     - echo "Destroy complete."
   environment:
     name: production

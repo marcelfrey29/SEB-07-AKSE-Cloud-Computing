@@ -11,14 +11,24 @@ resource "aws_iam_group_policy" "bots" {
             {
                 Sid      = "IAMAllowedPermissions"
                 Action   = [
-                    "iam:CreateRole",
+                    "iam:ListRoles",
                     "iam:GetRole",
+                    "iam:CreateRole",
+                    "iam:UpdateRole",
                     "iam:DeleteRole",
+                    "iam:PassRole",
+                    "iam:ListRolePolicies",
                     "iam:GetRolePolicy",
+                    "iam:DeleteRolePolicy",
                     "iam:AttachRolePolicy",
                     "iam:DetachRolePolicy",
-                    "iam:DeleteRolePolicy",
-                    "iam:ListRolePolicies",
+                    "iam:PutRolePolicy",
+                    "iam:UpdateRoleDescription",
+                    "iam:UpdateAssumeRolePolicy",
+                    "iam:ListAttachedRolePolicies",
+                    "iam:AddRoleToInstanceProfile",
+                    "iam:RemoveRoleFromInstanceProfile",
+                    "iam:ListInstanceProfilesForRole"
                 ]
                 Effect   = "Allow"
                 Resource = "*"

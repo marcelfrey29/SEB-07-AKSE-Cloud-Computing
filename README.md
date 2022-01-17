@@ -1,7 +1,6 @@
 # Project Paris - Todo Application
 
-Software Engineering<br>
-Selected Topics in Software Engineering - Cloud Computing 1<br>
+Software Engineering - Selected Topics in Software Engineering (Cloud Computing 1)<br>
 Heilbronn University<br>
 Marcel Frey
 
@@ -40,6 +39,7 @@ For a detailed documentation, check out the other README files:
 - [Setup: AWS Setup](documentation/04.AWS-Setup/README.md)
 - [Intermediate Presentation](documentation/05.Intermediate-Presentation/README.md)
 - [Final Presentation](documentation/06.Final-Presentation/README.md)
+- [Learnings](documentation/07.Learnings-and-Possible-Improvements/LEARNINGS.md)
 - [Possible Improvements](documentation/07.Learnings-and-Possible-Improvements/IMPROVEMENTS.md)
 
 ## Architecture and Services
@@ -63,6 +63,16 @@ For a detailed documentation, check out the other README files:
 | Secrets Manager                      | Securely store passwords and secrets. ECS takes Secret-ARNs as environment variables so that secrets are not stored in plain text |
 | Identity and Access Management (IAM) | For User-Groups, Users, Roles and Policies                                                                                        |
 
+#### AWS Terraform State Graph
+
+The Terraform State of the AWS Architecture as Graph:
+
+![Terraform Graph 2](documentation/06.Final-Presentation/Terraform-Graph-2.svg)
+
+The Terraform State of the AWS Architecture as Graph (other layout):
+
+![Terraform Graph 1](documentation/06.Final-Presentation/Terraform-Graph-1.svg)
+
 #### Local Architecture
 
 ![Final Local Architecture](documentation/05.Intermediate-Presentation/Local-Architecture.jpg)
@@ -85,7 +95,7 @@ For a detailed documentation, check out the other README files:
 | TypeScript            | JavaScript with Types                                                  |
 | Nest.js               | Application Framework for JavaScript/TypeScript to build REST-Services |
 | Nest-Keycloak-Connect | Library to easily work with Keycloak                                   |
-| AWS SDK               | AWS SDK to programmatically use DynamoDB (CRUD Operations)             ||
+| AWS SDK               | AWS SDK to programmatically use DynamoDB (CRUD Operations)             |
 
 **Frontend**:
 
@@ -100,12 +110,46 @@ For a detailed documentation, check out the other README files:
 
 #### Application
 
-TODO
+![Screenshots of the Application](documentation/06.Final-Presentation/App-01.png)
+
+![Screenshots of the Application](documentation/06.Final-Presentation/App-02.png)
+
+![Screenshots of the Application](documentation/06.Final-Presentation/App-03.png)
+
+#### CI/CD Pipeline
+
+All stages of the CI/CD Pipeline:
+
+![CI/CD Pipeline Stages](documentation/06.Final-Presentation/Pipeline-Stages.png)
+
+Job Dependencies of the CI/CD Pipeline:
+
+![CI/CD Pipeline Job Dependencies](documentation/06.Final-Presentation/Pipeline-Dependencies.png)
+
+Job Dependencies of the CI/CD Pipeline as graph:
+
+![CI/CD Pipeline Job Dependency Graph](documentation/06.Final-Presentation/Pipeline-Dependency-Graph.png)
 
 #### CloudWatch Metrics
 
-TODO
+The AWS Free-Tier usage for January 2022<sup>1</sup>:
 
-## Challenges and Learnings
+![Free-Tier Usage](documentation/06.Final-Presentation/Billing-Free-Tier.png)
 
-TODO
+EC2 Metrics:
+
+![EC2 Metrics](documentation/06.Final-Presentation/EC2-Metrics.png)
+
+RDS Metrics:
+
+![RDS Metrics](documentation/06.Final-Presentation/RDS-Metrics.png)
+
+ECS Metrics:
+
+![ECS Metrics](documentation/06.Final-Presentation/ECS-Metrics.png)
+
+S3 Metrics:
+
+![S3 Metrics](documentation/06.Final-Presentation/S3-Metrics.png)
+
+<sup>1: 01.01.2022 - 17.01.2022</sup>

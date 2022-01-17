@@ -40,10 +40,7 @@ For a detailed documentation, check out the other README files:
 - [Setup: AWS Setup](documentation/04.AWS-Setup/README.md)
 - [Intermediate Presentation](documentation/05.Intermediate-Presentation/README.md)
 - [Final Presentation](documentation/06.Final-Presentation/README.md)
-  <br><br>
-- [Architecture and Technologies](#architecture-and-services)
-- [Screenshots](#screenshots)
-- [Learnings and Challenges](#challenges-and-learnings)
+- [Possible Improvements](documentation/07.Learnings-and-Possible-Improvements/IMPROVEMENTS.md)
 
 ## Architecture and Services
 

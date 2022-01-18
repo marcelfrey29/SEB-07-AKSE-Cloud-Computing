@@ -196,7 +196,7 @@ Browsers don't like Mixed-Content. Mixed-Content is the combination of HTTP and 
 
 Our site is served with HTTPS (via CloudFront) but accesses Keycloak and the Backend-Service via HTTP. By default, all HTTP Requests are blocked for Security Reasons.
 
-Firefox and Chrome (both on Desktop) allow us to temporarily disable this protection (See [How to disable Mixed-Content](../04.AWS-Setup#disable-mixed-content)). Safari does not allow to disable that option. So Safari on macOS, iOS and iPadOS don't work and can't use our Todo-Application.
+Firefox and Chrome (both on Desktop) allow us to temporarily disable this protection (See [How to disable Mixed-Content](../04.AWS-Setup#13-disable-mixed-content)). Safari does not allow to disable that option. So Safari on macOS, iOS and iPadOS don't work and can't use our Todo-Application.
 
 **It's good that Mixed-Content is blocked by default** - but I'm happy that I still have an option to demonstrate by Application which is hosted on AWS. **For a real Application, HTTPS is a must-have!**
 

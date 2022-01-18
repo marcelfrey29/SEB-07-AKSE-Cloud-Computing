@@ -42,6 +42,28 @@ The Terraform Resources `aws_launch_template` and `aws_instance` have most of th
 
 The application should only use HTTPS. So, Keycloak and the Backend-Service need HTTPS support. This also fixes the [Mixed-Content-Problem](LEARNINGS.md#http--https---mixed-content).
 
+In addition, we should re-enable the HTTPS-Only option in Keycloak we disabled [here](../04.AWS-Setup/README.md#5-disable-keycloak-https).
+
+-----
+
+## Disable SSH Access for the EC2 Instance
+
+Currently, the EC2 Instance can be accessed via SSH, because I needed a quick and easy way to get the logs of my Backend-Service Container.
+
+With SSH access, I was able to run the `docker logs` command.
+
+SSH Access should be limited for security reasons.
+
+-----
+
+## The RDS Database should be in a private subnet
+
+Currently, the RDS Database is publicly reachable.
+
+The reason for the public access is, that I needed to [directly manipulate the database to make Keycloak work](../04.AWS-Setup/README.md#5-disable-keycloak-https).
+
+For security reasons the RDS Instance should be located in a private subnet. **Databases should always be placed in a private subnet!**
+
 -----
 
 ## Loosely Coupled Infrastructure as Code
@@ -78,4 +100,4 @@ Currently, the bot has full permissions for all required AWS Services:
 }
 ```
 
-The `*` should be replaced by the action names that are required for the deployment. See [AWS Service Authorization Documentation](https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html). 
+The `*` should be replaced by the action names that are required for the deployment. See [AWS Service Authorization Documentation](https://docs.aws.amazon.com/service-authorization/latest/reference/reference_policies_actions-resources-contextkeys.html).

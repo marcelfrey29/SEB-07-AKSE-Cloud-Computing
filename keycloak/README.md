@@ -16,7 +16,7 @@ Keycloak stores its data in a PostgreSQL Database (see below).
 | Key                 | Description                                 | Supported Values | Default |
 |---------------------|---------------------------------------------|------------------|---------|
 | `KEYCLOAK_USER`     | The username of the Keycloak admin account  | ` `              | ` `     |
-| `KEYCLOAK_PASSWORD` | The username of the Keycloak admin password | ` `              | ` `     |
+| `KEYCLOAK_PASSWORD` | The password of the Keycloak admin account  | ` `              | ` `     |
 | `DB_VENDOR`         | The vendor of the database that is used     | ` `              | ` `     |
 | `DB_ADDR`           | The address where the database is listening | ` `              | ` `     |
 | `DB_PORT`           | The port of the database                    | ` `              | ` `     |

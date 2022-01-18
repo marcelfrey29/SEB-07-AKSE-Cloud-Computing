@@ -1,6 +1,6 @@
 # Local Setup
 
-This Guide will explain how to set up a local version of the Todo-Application. In this README, a lot of additional information are provided so make sure to read it.
+This Guide will explain how to set up a local version of the Todo-Application.
 
 For an interactive setup process, you can run the interactive setup script (`/setup/setup.sh`).
 
@@ -12,6 +12,12 @@ $ cd setup/
 $ ./setup.sh
 ```
 
+-----
+
+**If you have problems or need help, please contact me!**
+
+-----
+
 ## 1. Required Tools
 
 Following Tools are required to set up and run the application:
@@ -22,7 +28,7 @@ Following Tools are required to set up and run the application:
 
 ## 2. Required Ports
 
-Make sure no other applications are running on these ports.
+The application requires multiple ports to be available on the host. Make sure no other applications are running on these ports.
 
 - `8080` Keycloak
 - `4000` Todo-Service
@@ -44,7 +50,7 @@ The first step is to create a `.env` file in the project root and define all req
 - Create a copy of the `.env.TEMPLATE` file
 - Make sure the name of the copy is `.env`
 - Open the newly created `.env` file
-    - And add values for following keys
+    - And add values for following keys - You have to choose usernames and passwords
         - `KEYCLOAK_DB_USER_NAME`
         - `KEYCLOAK_DB_USER_PASSWORD`
         - `KEYCLOAK_USER`

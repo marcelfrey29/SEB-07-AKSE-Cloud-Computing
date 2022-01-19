@@ -16,9 +16,9 @@ You need to [allow Mixed-Content](documentation/04.AWS-Setup/README.md#14-disabl
 #### Course / Project Objective
 
 - Build a cloud application and host it at a cloud provider
-- Create a containerized Backend which provides a REST-API and uses a Cloud Database Service
+- Create a containerized Backend-Service which provides a REST-API and uses a Cloud Database Service
 - Develop a Static Website that calls the Backend REST-API and host it in a Cloud Storage Service
-- The Application should run locally with Docker-Compose
+- The application should run locally with Docker-Compose
 - Advanced: Automate the deployment
 
 #### Results

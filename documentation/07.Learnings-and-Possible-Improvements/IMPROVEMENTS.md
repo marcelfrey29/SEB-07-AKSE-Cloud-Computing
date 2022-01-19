@@ -72,7 +72,7 @@ The application should be completely set up with just one command.
 
 Currently, there are three different Terraform projects. In addition, some variables can only be filled if the Terraform configuration was applied once. Then we can take these values, add them to the variables, and then apply the same Terraform configuration again.
 
-The goal should be that the _entire_ application can be launched with one `terrafrom apply` command.
+The goal should be that the _entire_ application can be launched with one `terraform apply` command.
 
 -----
 

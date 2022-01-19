@@ -32,10 +32,10 @@ $ cd terraform/workspace/aws-core
 $ terraform init
 
 # Plan
-$ terrafrom plan
+$ terraform plan
 
 # Apply the configuration
-$ terrafrom apply
+$ terraform apply
 ```
 
 # 2. Build the Frontend-Application
@@ -114,10 +114,10 @@ cd terraform/workspaces/aws/
 $ terraform init
 
 # Plan
-$ terrafrom plan
+$ terraform plan
 
 # Apply the configuration
-$ terrafrom apply
+$ terraform apply
 ```
 
 **There is a bug that the EC2 Instance does not register itself automatically at the ECS Cluster**. This means that ECS can't start containers. To fix this issue, see [next step](#5-reboot-the-ec2-instance)
@@ -193,10 +193,10 @@ cd terraform/workspaces/aws/
 $ terraform init
 
 # Plan
-$ terrafrom plan -var-file="aws.tfvars"
+$ terraform plan -var-file="aws.tfvars"
 
 # Apply the configuration
-$ terrafrom apply -var-file="aws.tfvars"
+$ terraform apply -var-file="aws.tfvars"
 ```
 
 ## 9. Re-build the Frontend-Application
@@ -285,10 +285,10 @@ cd terraform/workspaces/aws/
 $ terraform init
 
 # Plan
-$ terrafrom plan
+$ terraform plan
 
 # Apply the configuration
-$ terrafrom apply
+$ terraform apply
 ```
 
 ## 12. Enable User Registration

@@ -17,11 +17,11 @@ This includes things like `user groups`, `users` and the `container registry` (E
 The Terraform State of this project is placed locally in the source folder.
 
 ```shell
-$ cd terrafrom/workspaces/aws-core
+$ cd terraform/workspaces/aws-core
 
-$ terrafrom init
-$ terrafrom plan
-$ terrafrom apply
+$ terraform init
+$ terraform plan
+$ terraform apply
 ```
 
 ## AWS
@@ -45,11 +45,11 @@ If these values change, some parts of the infrastructure might have to be recrea
 | `keycloak_client_secret` | The client secret of the Keycloak Realm for the Backend-Service |
 
 ```shell
-$ cd terrafrom/workspaces/aws
+$ cd terraform/workspaces/aws
 
-$ terrafrom init
-$ terrafrom plan
-$ terrafrom apply
+$ terraform init
+$ terraform plan
+$ terraform apply
 ```
 
 ## Config
@@ -73,9 +73,9 @@ keycloak_root_url_frontend = "http://localhost:3000" // The URL where the Fronte
 The Terraform State of this project is placed locally in the source folder.
 
 ```shell
-$ cd terrafrom/workspaces/config
+$ cd terraform/workspaces/config
 
-$ terrafrom init
-$ terrafrom plan -var-file="" # local.tfvars OR aws.tfvars
-$ terrafrom apply -var-file="" # local.tfvars OR aws.tfvars
+$ terraform init
+$ terraform plan -var-file="" # local.tfvars OR aws.tfvars
+$ terraform apply -var-file="" # local.tfvars OR aws.tfvars
 ```

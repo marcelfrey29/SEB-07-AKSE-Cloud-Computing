@@ -112,10 +112,10 @@ $ cd terraform/workspaces/config
 $ terraform init
 
 # Plan
-$ terrafrom plan -var-file="local.tfvars" # then enter the KEYCLOAK_USER and KEYCLOAK_PASSWORD values
+$ terraform plan -var-file="local.tfvars" # then enter the KEYCLOAK_USER and KEYCLOAK_PASSWORD values
 
 # Apply the configuration
-$ terrafrom apply -var-file="local.tfvars" # then enter the KEYCLOAK_USER and KEYCLOAK_PASSWORD values
+$ terraform apply -var-file="local.tfvars" # then enter the KEYCLOAK_USER and KEYCLOAK_PASSWORD values
 ```
 
 ## 7. Get Keycloak Values and add them to the Environment Variable file
@@ -197,6 +197,12 @@ In your other terminal window, run following command:
 # In the project root, start the Docker-Compose stack
 $ docker compose up --build -d
 ```
+
+**Wait until all services are up and running again.**
+
+- http://localhost:3000
+- http://localhost:4000
+- http://localhost:8080
 
 ## 11. Enable User Registration in Keycloak
 

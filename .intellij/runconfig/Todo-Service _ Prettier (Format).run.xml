@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Todo-Service | Prettier (Format)" type="js.build_tools.npm">
+  <configuration default="false" name="Todo-Service | [CORE] | Prettier (Format)" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/todo-service/package.json" />
     <command value="run" />
     <scripts>

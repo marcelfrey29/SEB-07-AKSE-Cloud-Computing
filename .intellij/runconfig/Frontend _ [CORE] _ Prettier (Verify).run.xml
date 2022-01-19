@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Frontend | [CORE] | Test" type="js.build_tools.npm">
+  <configuration default="false" name="Frontend | [CORE] | Prettier (Verify)" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/todo-frontend/package.json" />
     <command value="run" />
     <scripts>
-      <script value="test" />
+      <script value="lint:prettier:check" />
     </scripts>
     <node-interpreter value="project" />
     <envs />

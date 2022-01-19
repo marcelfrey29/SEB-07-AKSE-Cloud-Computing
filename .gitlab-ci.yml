@@ -9,7 +9,6 @@ stages:
   - package
   - verify
   - deploy
-  - cleanup
 
 # Variables
 variables:
@@ -36,6 +35,9 @@ variables:
   # Artefacts
   FRONTEND_ARTEFACT_DIST_FOLDER_PATH: "todo-frontend/dist"
   BACKEND_ARTEFACT_DIST_FOLDER_PATH: "todo-service/dist"
+  # Docker
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
 
 # Base Rules (other jobs can extend / inherit from this rule)
 .base:
@@ -76,7 +78,16 @@ variables:
 
 .package-base:
   extends: .base
-  image: "docker:20.10.10"
+  image:
+    name: "amazon/aws-cli:2.4.10"
+    entrypoint: [ "" ]
+  before_script:
+    - echo "Installing Docker"
+    - amazon-linux-extras install docker -y
+    - echo "Installed Software Versions..."
+    - aws --version
+    - docker -v
+    - echo "Docker and the AWS CLI are ready to use."
 
 .infrastructure-base:
   extends: .base
@@ -122,12 +133,12 @@ Test Frontend:
     changes:
       - todo-frontend/**/*
   script:
-    - npm run test:unit
-    - echo "Unit Tests complete."
     - npm run lint:prettier:check
     - echo "Prettier Checks complete."
     - npm run lint:eslint:check
     - echo "ESLint Checks complete."
+#    - npm run test:unit
+#    - echo "Unit Tests complete." # TODO: Enable Tests
 
 # TodoService
 Build Todo-Service:
@@ -166,6 +177,10 @@ Test Todo-Service:
 Package Todo-Service:
   extends: .package-base
   stage: package
+  # See https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker
+  # and https://docs.gitlab.com/ee/ci/services/index.html#using-services-with-docker-run-docker-in-docker-side-by-side
+  services:
+    - docker:20.10.7-dind
   needs:
     - Build Todo-Service
     - Test Todo-Service
@@ -175,19 +190,19 @@ Package Todo-Service:
   # In this case, we download the artifact from the 'Build Todo-Service' job, which is 2 stages before
   dependencies:
     - Build Todo-Service
-  #  only:
-  #    changes:
-  #      - todo-service/**/*
   script:
-    - echo "TODO..."
     - cd todo-service
-    - ls -la
-    - cd dist
-    - ls -la
-    - echo "TODO..."
-    - echo "Packaged Todo-Service."
-    - echo "TODO..."
-    - echo "Uploaded Todo-Service."
+    - echo "Docker Infos..."
+    - docker info
+    - echo "Building Image..."
+    - docker build -f Production.Dockerfile -t akse-todo-service .
+    - echo "Build Docker Image."
+    - aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${AWS_DOCKER_REGISTRY_URL}
+    - echo "Loggedin to ECR / Docker"
+    - docker tag akse-todo-service:latest ${AWS_DOCKER_REGISTRY_URL}/akse-todo-service:latest
+    - echo "Tagged Docker Image"
+    - docker push ${AWS_DOCKER_REGISTRY_URL}/akse-todo-service:latest
+    - echo "Pushed Image to ECR."
 
 # Terraform
 Initialize Terraform:
@@ -221,30 +236,11 @@ Plan Deployment:
   dependencies:
     - Build Frontend
   script:
-    - gitlab-terraform plan
-    - gitlab-terraform plan-json
-    - pwd
-    - cd ..
-    - pwd
-    - cd ..
-    - pwd
-    - cd ..
-    - pwd
-    - ls -la
-    - cd todo-frontend
-    - pwd
-    - ls -la
-    - cd dist
-    - pwd
-    - ls -la
-    - cat index.html
-    - echo "TODO FRONTEND DONE"
-    - cd ../../todo-service
-    - ls -la
-    - cd dist
-    - ls -la
-    - echo "TODO SERVICE DONE"
-    - echo "Planning for deployment finished."
+    - gitlab-terraform plan -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}"
+    - echo "Terraform Plan complete."
+    - gitlab-terraform plan-json -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}"
+    - echo "Generated the JSON output of the Plan"
+    - echo "Complete."
   artifacts:
     name: plan
     paths:
@@ -260,25 +256,11 @@ Deployment:
     - Plan Deployment
   dependencies:
     - Build Frontend
+    - Plan Deployment
   script:
-    #    - gitlab-terraform apply
-    - echo "TODO..."
-    - cd ../../../todo-frontend/dist
-    - ls -la
+    - echo "TODO - Enable Deployment..."
+    # - gitlab-terraform apply -var="keycloak_db_username=${TERRAFORM_KEYCLOAK_DB_USER}" -var="keycloak_db_password=${TERRAFORM_KEYCLOAK_DB_PASSWORD}" -var="keycloak_user=${TERRAFORM_KEYCLOAK_USER}" -var="keycloak_password=${TERRAFORM_KEYCLOAK_PASSWORD}" -var="keycloak_client_secret=${TERRAFORM_TODO_SERVICE_CLIENT_SECRET}" # TODO: Enable
     - echo "Deploy complete."
-  environment:
-    name: production
-  #  rules:
-  #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  #      when: manual
-#  when: manual
-
-Destroy:
-  extends: .infrastructure-base
-  stage: cleanup
-  script:
-    - gitlab-terraform destroy
-    - echo "Destroy complete."
   environment:
     name: production
   when: manual

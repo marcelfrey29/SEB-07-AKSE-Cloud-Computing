@@ -64,7 +64,7 @@ printWait
 # 2. Ports
 printTask "[2] The application requires following ports to be available on the host:"
 printCheck "8080 (Keycloak)"
-printCheck "4000 (Todo-Service, PostgreSQL)"
+printCheck "4000 (Todo-Service)"
 printCheck "3000 (Frontend)"
 printCheck "8000 (Todo-Database, DynamoDB)"
 print "Make sure there are no other applications running on these ports."
@@ -86,8 +86,8 @@ printCheck "KEYCLOAK_PASSWORD"
 printWait
 
 # 4. Frontend: Environment Variables
-print "[4] A note on the Frontend environment:"
-printTask "The Frontend uses its own ENV files that are already configured for you."
+printTask "[4] A note on the Frontend environment:"
+print "The Frontend uses its own ENV files that are already configured for you."
 print "You don't need to do anything here!"
 print "If you need additional infos, check out the '/documentation/03.Local-Setup/README.md' file"
 printWait
@@ -150,12 +150,15 @@ printWait
 # 9. DynamoDB
 printTask "[9] Create the 'Todos' Table in DynamoDB-Local"
 print "In the next steps, this script will run some AWS commands, feel free to check the script code first."
-printCheck
+printWait
 
 printTask "Currently, there are following tables:"
 echo "----- ----- -----"
 aws dynamodb list-tables --endpoint-url http://localhost:8000
 echo "----- ----- -----"
+printWait
+
+printTask "If your terminal get stuck after the next step, press 'q'."
 printWait
 
 printTask "Creating the 'Todos' table..."
@@ -184,6 +187,7 @@ printWait
 
 # 10.
 printTask "[10] Now all environment variables are defined and DynamoDB is ready. Let's restart our application"
+printCheck "Make sure you are in the project root!"
 printCheck "Run 'docker compose up --build -d' in your other terminal window"
 print "The restart should be much faster than the initial launch, but can still take a while..."
 printWait

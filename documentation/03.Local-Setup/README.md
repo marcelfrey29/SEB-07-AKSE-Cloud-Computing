@@ -73,7 +73,14 @@ Choosing the correct file is done by the npm build scripts. Building for product
 
 ## 5. Initial `docker-compose up`
 
-Now it's time to run `docker compose up --build -d`.
+Now it's time to run `docker compose up --build -d` for the first time.
+
+Open a new terminal window and run following command:
+
+```shell
+# In the project root, start the Docker-Compose stack
+$ docker compose up --build -d
+```
 
 **Building and running all services for the first time can take a few minutes! Time to get some coffee ☕️ 😀**
 
@@ -158,6 +165,8 @@ In this step, we create the DynamoDB Table for the Backend-Service.
 
 Run following commands to create the table and verify that is has been created:
 
+**If your terminal get stuck after the next step, press `q`**
+
 ```shell
 # List all tables (should return no tables)
 $ aws dynamodb list-tables --endpoint-url http://localhost:8000
@@ -180,7 +189,14 @@ $ aws dynamodb list-tables --endpoint-url http://localhost:8000
 
 ## 10. Restart the Application
 
-Rebuild and restart all services: Run `docker compose up --build -d` from the project root.
+Rebuild and restart all services: Run `docker compose up --build -d` from the **project root**.
+
+In your other terminal window, run following command:
+
+```shell
+# In the project root, start the Docker-Compose stack
+$ docker compose up --build -d
+```
 
 ## 11. Enable User Registration in Keycloak
 

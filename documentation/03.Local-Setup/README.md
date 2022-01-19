@@ -63,7 +63,7 @@ The first step is to create a `.env` file in the project root and define all req
 
 ## 4. Frontend: Environment Variables
 
-Because the frontend application is deployed by uploading static files to S3, the environment variables have to be injected on build-time. For more details see the [Frontend Documentation](../../todo-frontend/README.md#environment-variables). To archive the highest dev/prod parity as possible, there are no variables injected via the `docker-compose.yml` file. The frontend application completely relies on its own environment variable file.
+Because the Frontend-Application is deployed by uploading static files to S3, the environment variables have to be injected on build-time. For more details see the [Frontend Documentation](../../todo-frontend/README.md#environment-variables). To archive the highest dev/prod parity as possible, there are no variables injected via the `docker-compose.yml` file. The frontend application completely relies on its own environment variable file.
 
 In the frontend project (`/todo-frontend`) there is a template file (`TEMPLATE.env`). For local development, the file `dev.env` is used. For AWS, the file `production.env` is used.
 

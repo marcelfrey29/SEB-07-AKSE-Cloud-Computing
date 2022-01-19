@@ -78,7 +78,7 @@ custom_error_response {
 
 ## DB Subnet Requirements
 
-While trying to create the RDS Database and the Database Subnet with Terraform, it turned out that the Database Subnet needs to be places in at least two different subnets which are located in at least two different Availability Zones. Before I was able to create the RDS Database, I had to create a second subnet.
+While trying to create the RDS Database and the Database Subnet with Terraform, it turned out that the Database Subnet needs to be placed in at least two different subnets which are located in at least two different Availability Zones. Before I was able to create the RDS Database, I had to create a second subnet.
 
 -----
 
@@ -169,7 +169,7 @@ Loosely Coupling Infrastructure is not easy.
 Examples:
 
 - The Elastic Container Registry can't be part of the main project, because we have to push an image before we can deploy the ECS Services and Tasks.
-- The Keycloak configuration is currently places in a separate project, which depends on values from the main project.
+- The Keycloak configuration is currently placed in a separate project, which depends on values from the main project.
 
 Note: I haven't tried to apply the whole configuration at once. So there might be some conflicts/dependencies that are currently unknown. While development, I applied the infrastructure in incremental steps.
 
@@ -196,7 +196,7 @@ Browsers don't like Mixed-Content. Mixed-Content is the combination of HTTP and 
 
 Our site is served with HTTPS (via CloudFront) but accesses Keycloak and the Backend-Service via HTTP. By default, all HTTP Requests are blocked for Security Reasons.
 
-Firefox and Chrome (both on Desktop) allow us to temporarily disable this protection (See [How to disable Mixed-Content](../04.AWS-Setup#13-disable-mixed-content)). Safari does not allow to disable that option. So Safari on macOS, iOS and iPadOS don't work and can't use our Todo-Application.
+Firefox and Chrome (both on Desktop) allow us to temporarily disable this protection (See [How to disable Mixed-Content](../04.AWS-Setup#14-disable-mixed-content)). Safari does not allow to disable that option. So Safari on macOS, iOS and iPadOS don't work and can't use our Todo-Application.
 
 **It's good that Mixed-Content is blocked by default** - but I'm happy that I still have an option to demonstrate by Application which is hosted on AWS. **For a real Application, HTTPS is a must-have!**
 

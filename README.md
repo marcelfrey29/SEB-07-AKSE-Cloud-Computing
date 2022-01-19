@@ -7,7 +7,7 @@ Marcel Frey
 -----
 
 Open the Web-App: https://d3tl77k2m239or.cloudfront.net <br>
-You need to [allow Mixed-Content](documentation/04.AWS-Setup/README.md#13-disable-mixed-content) to use the Web-App.
+You need to [allow Mixed-Content](documentation/04.AWS-Setup/README.md#14-disable-mixed-content) to use the Web-App.
 
 -----
 
@@ -139,6 +139,14 @@ Job Dependencies of the CI/CD Pipeline:
 Job Dependencies of the CI/CD Pipeline as graph:
 
 ![CI/CD Pipeline Job Dependency Graph](documentation/06.Final-Presentation/Pipeline-Dependency-Graph.png)
+
+Terraform Report from the CI/CD Pipeline in a Merge Request:
+
+![Merge Request: Terraform Report](documentation/06.Final-Presentation/MR-TF-Report.png)
+
+CI/CD in a Merge Request:
+
+![Merge Request: CI/CD](documentation/06.Final-Presentation/MR-CI.png)
 
 #### CloudWatch Metrics
 

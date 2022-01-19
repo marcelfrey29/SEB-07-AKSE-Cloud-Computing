@@ -1,13 +1,13 @@
 # Todo Application - Frontend
 
 The Frontend-Application is a Single Page Application (SPA) that provides the User Interface of the Todo-Application.<br>
-All data have to be queried and send to the [Backend Service](../todo-service/README.md).<br>
+All data have to be queried and send to the [Backend-Service](../todo-service/README.md).<br>
 Every request needs to contain the `Authorization` Header.<br>
 The frontend is responsible for redirecting the user to [Keycloak](../keycloak/README.md) and handle the redirect.<br>
 
 ## Core Technologies
 
-- Node.js **16** (never versions are not supported, e.g. Node 17 is not working)
+- Node.js **16** (newer versions are not supported, e.g. Node 17 is not working)
 - [Nuxt.js](https://nuxtjs.org/) based on Vue.js
 - Nuxt Auth
 - BootstrapVue and Bootstrap

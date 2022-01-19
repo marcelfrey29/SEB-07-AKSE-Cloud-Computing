@@ -19,9 +19,9 @@ The Terraform State of this project is placed locally in the source folder.
 ```shell
 $ cd terrafrom/workspaces/aws-core
 
+$ terrafrom init
 $ terrafrom plan
 $ terrafrom apply
-$ terrafrom destroy
 ```
 
 ## AWS
@@ -47,27 +47,27 @@ If these values change, some parts of the infrastructure might have to be recrea
 ```shell
 $ cd terrafrom/workspaces/aws
 
+$ terrafrom init
 $ terrafrom plan
 $ terrafrom apply
-$ terrafrom destroy
 ```
 
 ## Config
 
 The configuration-project is used to configure the launched services of the applications.
 
-Before running terraform, choose the environment you want to configure.<br>
+Before running Terraform, choose the environment you want to configure.<br>
 There are two already prepared environments:
 
 - Local: `local.tfvars`
-- AWS: `aws.tfvars` (**You need to update the file with your AWS DNS-Names before running terraform!**)
+- AWS: `aws.tfvars` (**You need to update the file with your AWS DNS-Names before running Terraform!**)
 
 ```terraform
 keycloak_url               = "http://localhost:8080" // The URL where the Keycloak Server is running
 keycloak_redirect_frontend = [
-    "http://localhost:3000/*" // The URL where the Frontend Application is hosted. The URL has to end with "/*"
+    "http://localhost:3000/*" // The URL where the Frontend-Application is hosted. The URL has to end with "/*"
 ]
-keycloak_root_url_frontend = "http://localhost:3000" // The URL where the Frontend Application is hosted
+keycloak_root_url_frontend = "http://localhost:3000" // The URL where the Frontend-Application is hosted
 ```
 
 The Terraform State of this project is placed locally in the source folder.
@@ -75,7 +75,7 @@ The Terraform State of this project is placed locally in the source folder.
 ```shell
 $ cd terrafrom/workspaces/config
 
+$ terrafrom init
 $ terrafrom plan -var-file="" # local.tfvars OR aws.tfvars
 $ terrafrom apply -var-file="" # local.tfvars OR aws.tfvars
-$ terrafrom destroy -var-file="" # local.tfvars OR aws.tfvars
 ```

@@ -42,7 +42,7 @@ The Terraform Resources `aws_launch_template` and `aws_instance` have most of th
 
 The application should only use HTTPS. So, Keycloak and the Backend-Service need HTTPS support. This also fixes the [Mixed-Content-Problem](LEARNINGS.md#http--https---mixed-content).
 
-In addition, we should re-enable the HTTPS-Only option in Keycloak we disabled [here](../04.AWS-Setup/README.md#5-disable-keycloak-https).
+In addition, we should re-enable the HTTPS-Only option in Keycloak we disabled [here](../04.AWS-Setup/README.md#7-disable-keycloak-https).
 
 -----
 
@@ -60,7 +60,7 @@ SSH Access should be limited for security reasons.
 
 Currently, the RDS Database is publicly reachable.
 
-The reason for the public access is, that I needed to [directly manipulate the database to make Keycloak work](../04.AWS-Setup/README.md#5-disable-keycloak-https).
+The reason for the public access is, that I needed to [directly manipulate the database to make Keycloak work](../04.AWS-Setup/README.md#7-disable-keycloak-https).
 
 For security reasons the RDS Instance should be located in a private subnet. **Databases should always be placed in a private subnet!**
 

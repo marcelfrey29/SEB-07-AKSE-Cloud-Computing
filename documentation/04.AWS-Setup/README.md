@@ -6,7 +6,7 @@ Prerequisite:
 
 - AWS Account
 - Terraform
-- Node.js
+- Node.js (Version 16)
 - Docker
 
 This guide uses the AWS Region `eu-central-1`. If you use a different region, you might have to make additional adjustments.
@@ -57,7 +57,7 @@ npm run generate:prod
 
 ## 3. Build the Backend-Service and push it to ECR
 
-The Backend-Application will be deployed as Container. In the ECS Task-Definition we can define an image we want to use. Instead of pulling images from Docker Hub, we use own Elastic Container Registry we created in [Step 1](#1-setup-common-infrastructure). Everything that relates to ECS is deployed with Terraform. Before we can apply the Terraform configuration, we have to build and upload an image of our Backend-Service to ECR.
+The Backend-Service will be deployed as Container. In the ECS Task-Definition we can define an image we want to use. Instead of pulling images from Docker Hub, we use own Elastic Container Registry we created in [Step 1](#1-setup-common-infrastructure). Everything that relates to ECS is deployed with Terraform. Before we can apply the Terraform configuration, we have to build and upload an image of our Backend-Service to ECR.
 
 In the following Code, replace `ACCOUNT_NUMBER` with the Account Number of your AWS Account.
 
@@ -98,13 +98,13 @@ After changing the values, we can run Terraform. If you plan or apply the Terraf
 **On the first run, please note the values you pass to Terraform, because you need them again later**.<br>
 Tip: I stored these values in my password manager.
 
-| Variable                 | Description                                              | Note                                                                                                                                           |
-|--------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
-| `keycloak_db_username`   | The admin username for the PostgreSQL Database (RDS)     | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
-| `keycloak_db_password`   | The admin password for the PostgreSQL Database (RDS)     | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
-| `keycloak_user`          | The username of the Keycloak admin account               | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
-| `keycloak_password`      | The password of the Keycloak admin account               | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
-| `keycloak_client_secret` | The client secret of the backend application in Keycloak | We don't have a value currently, use `DEMO` for now                                                                                            |
+| Variable                 | Description                                          | Note                                                                                                                                           |
+|--------------------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------|
+| `keycloak_db_username`   | The admin username for the PostgreSQL Database (RDS) | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
+| `keycloak_db_password`   | The admin password for the PostgreSQL Database (RDS) | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
+| `keycloak_user`          | The username of the Keycloak admin account           | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
+| `keycloak_password`      | The password of the Keycloak admin account           | Choose a value, only use alphanumeric characters, see [details](../07.Learnings-and-Possible-Improvements/LEARNINGS#secrets-on-aws-and-gitlab) |
+| `keycloak_client_secret` | The client secret of the Backend-Service in Keycloak | We don't have a value currently, use `DEMO` for now                                                                                            |
 
 ```shell
 # From the root folder, navigate to terraform/workspaces/aws
@@ -120,14 +120,28 @@ $ terrafrom plan
 $ terrafrom apply
 ```
 
-Now, you should be able to access the different services. Use the `output` values from Terraform in combination with the Service-Ports. You can find the Ports for each service in the `terraform/workspaces/aws/variables.tf` file.
+**There is a bug that the EC2 Instance does not register itself automatically at the ECS Cluster**. This means that ECS can't start containers. To fix this issue, see [next step](#5-reboot-the-ec2-instance)
+
+## 5. Reboot the EC2 Instance
+
+The EC2 Instance is set up with CloudInit. CloudInit installs all required software and configures the ECS Agent.
+
+But, the Instance does not register itself at the ECS Cluster. A manual restart is fixing this problem.
+
+**Before you reboot the Instance, make sure to wait a bit so that CloudInit can finish the setup!** You can check the EC2 Logs to see the progress.
+
+So open the EC2 page in the AWS Management Console and restart the Instance.
+
+## 6. Make sure you can access the Services
+
+Now, you should be able to access the different services. Use the `output` values from Terraform (see Step 4) in combination with the Service-Ports. You can find the Ports for each service in the `terraform/workspaces/aws/variables.tf` file.
 
 - Frontend (CloudFront) - Should show the Single Page Application
 - Frontend (S3) - Should show access denied, because only CloudFront is allowed to access the S3 Bucket
 - Keycloak (Port: 5902)
 - Backend-Service (Port: 5903)
 
-## 5. Disable Keycloak HTTPS
+## 7. Disable Keycloak HTTPS
 
 By default, Keycloak enforces HTTPS. Because there is no HTTPS support, we can't access Keycloak - not even to disable the HTTPS enforcement...
 
@@ -145,17 +159,7 @@ To disable HTTPS support, you have to connect to the RDS Instance, for example w
 
 ![Screenshots of the IntelliJ DB Tools](DB-Tools-Keycloak-SSL.png)
 
-## 6. Reboot the EC2 Instance
-
-The EC2 Instance is set up with CloudInit. CloudInit installs all required software and configures the ECS Agent.
-
-But, the Instance does not register itself at the ECS Cluster. A manual restart is fixing this problem.
-
-**Before you reboot the Instance, make sure to wait a bit so that CloudInit can finish the setup!** You can check the EC2 Logs to see the progress.
-
-So open the EC2 page in the AWS Management Console and restart the Instance.
-
-## 7. Configure Keycloak with Terraform
+## 8. Configure Keycloak with Terraform
 
 After disabling the HTTPS enforcement in Keycloak, we can access the Keycloak UI as well as the API. That's good news because the Keycloak Terraform Provider needs to talk to the API. To configure Keycloak, we use Terraform again.
 
@@ -166,8 +170,8 @@ Open the file `terraform/workspaces/config/aws.tfvars` and adjust the following 
 | Variable                     | Description                                                                    |
 |------------------------------|--------------------------------------------------------------------------------|
 | `keycloak_url`               | The URL where the Keycloak Server is running, including the port               |
-| `keycloak_redirect_frontend` | The URL where the Frontend Application is hosted. The URL has to end with `/*` |
-| `keycloak_root_url_frontend` | The URL where the Frontend Application is hosted                               |
+| `keycloak_redirect_frontend` | The URL where the Frontend-Application is hosted. The URL has to end with `/*` |
+| `keycloak_root_url_frontend` | The URL where the Frontend-Application is hosted                               |
 
 Example:
 
@@ -195,7 +199,7 @@ $ terrafrom plan -var-file="aws.tfvars"
 $ terrafrom apply -var-file="aws.tfvars"
 ```
 
-## 8. Re-build the Frontend Application
+## 9. Re-build the Frontend-Application
 
 The Frontend-Application needs knowledge about Keycloak and the Backend-Service, because...
 
@@ -209,7 +213,7 @@ Open the `/todo-frontend/production.env` file and change the values from the tab
 | Variable                         | Description                                                      |
 |----------------------------------|------------------------------------------------------------------|
 | `NUXT_ENV_KEYCLOAK_HOST`         | The URL where the Keycloak Server is running, including the port |
-| `NUXT_ENV_KEYCLOAK_REDIRECT_URI` | The URL where the Frontend Application is hosted                 |
+| `NUXT_ENV_KEYCLOAK_REDIRECT_URI` | The URL where the Frontend-Application is hosted                 |
 | `NUXT_ENV_TODO_SERVICE_URL`      | The URL where the Backend-Service is hosted, including the port  |
 
 Example:
@@ -241,7 +245,7 @@ npm run generate:prod
 
 Uploading the new files from the `/dist` folder is done in a later step.
 
-## 9. Get the Keycloak Client Secret
+## 10. Get the Keycloak Client Secret
 
 The Backend-Service needs to talk to Keycloak, so it needs the URL and the Keycloak Secret.
 
@@ -255,23 +259,23 @@ The Client Secret is required when we apply Terraform, but in [Step 4](#4-deploy
 - On the top, select the _Credentials_ Tab.
 - Click the "Regenerate Secret" button. **Note this secret because we require it later.**
 
-| Variable                 | Description                                              | Note                            |
-|--------------------------|----------------------------------------------------------|---------------------------------|
-| `keycloak_client_secret` | The client secret of the backend application in Keycloak | Note the value you "Regenerate" |
+| Variable                 | Description                                          | Note                            |
+|--------------------------|------------------------------------------------------|---------------------------------|
+| `keycloak_client_secret` | The client secret of the Backend-Service in Keycloak | Note the value you "Regenerate" |
 
-## 10. Deploy with Terraform (again)
+## 11. Deploy with Terraform (again)
 
 Now we have updated all files with the URLs of our server. Plus, we know all values we have to pass to Terraform.
 
 Let's apply our updates Terraform Configuration! If you plan or apply the Terraform configuration, Terraform will ask for some values.<br>
 
-| Variable                 | Description                                              | Note                             |
-|--------------------------|----------------------------------------------------------|----------------------------------|
-| `keycloak_db_username`   | The admin username for the PostgreSQL Database (RDS)     | Use the value you noted earlier! |
-| `keycloak_db_password`   | The admin password for the PostgreSQL Database (RDS)     | Use the value you noted earlier! |
-| `keycloak_user`          | The username of the Keycloak admin account               | Use the value you noted earlier! |
-| `keycloak_password`      | The password of the Keycloak admin account               | Use the value you noted earlier! |
-| `keycloak_client_secret` | The client secret of the backend application in Keycloak | Use the value you noted earlier! |
+| Variable                 | Description                                          | Note                             |
+|--------------------------|------------------------------------------------------|----------------------------------|
+| `keycloak_db_username`   | The admin username for the PostgreSQL Database (RDS) | Use the value you noted earlier! |
+| `keycloak_db_password`   | The admin password for the PostgreSQL Database (RDS) | Use the value you noted earlier! |
+| `keycloak_user`          | The username of the Keycloak admin account           | Use the value you noted earlier! |
+| `keycloak_password`      | The password of the Keycloak admin account           | Use the value you noted earlier! |
+| `keycloak_client_secret` | The client secret of the Backend-Service in Keycloak | Use the value you noted earlier! |
 
 ```shell
 # From the root folder, navigate to terraform/workspaces/aws
@@ -287,7 +291,7 @@ $ terrafrom plan
 $ terrafrom apply
 ```
 
-## 11. Enable User Registration
+## 12. Enable User Registration
 
 By default, "User Registration" is disabled for the Todo-Realm in Keycloak. Before we can use the application, we have to enable it.
 
@@ -301,7 +305,7 @@ By default, "User Registration" is disabled for the Todo-Realm in Keycloak. Befo
 **Note**:<br>
 It is also possible to enable user registration via Terraform. In the `/terraform/workspaces/config/keycloak-realms.tf` file, just set the value for `registration_allowed` to `true` and apply the configuration.
 
-## 12. Open App and sign in
+## 13. Open App and sign in
 
 The application is now fully setup and ready to use.<br>
 Congratulations! 🥳
@@ -311,9 +315,9 @@ Congratulations! 🥳
 - Open your Cloudfront URL (from the Terraform Outputs) and click the "Sign in" Button in the upper right
 - On the first time, you have to register for a new account (you can't use the admin account because it is not in the Todo-Realm)
     - Click on "Register" and follow the registration process
-- After the registration you are redirected to the "Marketing Page" - Continue with [Step 13](#13-disable-mixed-content) to fix this issue.
+- After the registration you are redirected to the "Marketing Page" - Continue with [Step 14](#14-disable-mixed-content) to fix this issue.
 
-## 13. Disable Mixed-Content
+## 14. Disable Mixed-Content
 
 After a "Sign in" or "Register" you should be redirected to the Application. Instead, you just see the "Marketing Page" again.
 
@@ -333,7 +337,7 @@ Then, click on the "Sign in" button again. Now, everything should work fine.
 
 #### Disable in Chrome
 
-1. Click on the Lock next to the address bar
+1. Click on the Warning next to the address bar
 2. Click on "Site settings"
 3. Search for the permission "Insecure content" and set the value to `allow`
 
@@ -341,7 +345,7 @@ Then, click on the "Sign in" button again. Now, everything should work fine.
 
 ![Chrome 1](Chrome-1.png) ![Chrome 2](Chrome-2.png)
 
-## 14. Use the App
+## 15. Use the App
 
 Now you should be able to use the Todo-Application!<br>
 Congratulations! 🥳

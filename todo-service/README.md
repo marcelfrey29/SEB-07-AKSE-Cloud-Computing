@@ -10,7 +10,7 @@ For local development, DynamoDB-Local is used (see below).
 
 ## Core Technologies
 
-- Node.js **16** (never versions are not supported, e.g. Node 17 is not working)
+- Node.js **16** (newer versions are not supported, e.g. Node 17 is not working)
 - [Nest.js](https://github.com/nestjs/nest)
 - Nest-Keycloak-Connect
 - AWS SDK (DynamoDB, DynamoDB-Utils)

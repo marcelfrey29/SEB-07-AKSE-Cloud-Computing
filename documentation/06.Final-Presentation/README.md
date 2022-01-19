@@ -74,6 +74,10 @@ Job Dependencies of the CI/CD Pipeline:
 
 ![CI/CD Pipeline Job Dependencies](../06.Final-Presentation/Pipeline-Dependencies.png)
 
+Terraform Report from the CI/CD Pipeline in a Merge Request:
+
+![Merge Request: Terraform Report](../06.Final-Presentation/MR-TF-Report.png)
+
 ## Learnings and possible Improvements
 
 #### S3 Static Website Hosting - MIME-Types and Terraform

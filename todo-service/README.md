@@ -55,6 +55,14 @@ For local development, DynamoDB-Local is used (see below).
     - All dependencies are installed inside the container
     - All relevant files are automatically mounted into the container
     - The correct script runs automatically
+
+> The `node_modules` directory is NOT mounted into the container! It is excluded from the mount.<br>
+> Mounting this folder can cause problems if it does not exist or if it is empty!<br>
+> The reason is that we first install all dependencies in the container, and then override them with our (potential empty) local folder!
+>
+> If you add new dependencies, you have to rebuild the container image!<br>
+> Run `docker compose up --build -d` from the project root to do so.
+
 - If you want to work outside of Docker, you can use following commands:
     - **If you run the app outside of Docker, you have to pass all required environment variables manually**
     - Also, make sure that all Ports are forwarded correctly

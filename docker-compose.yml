@@ -42,6 +42,8 @@ services:
     container_name: todo-frontend
     volumes:
       - "./todo-frontend/:/home/app"
+      # Don't override node_modules which can be empty on the local machine
+      - "/home/app/node_modules"
     ports:
       - "3000:3000"
     networks:
@@ -67,6 +69,8 @@ services:
     container_name: todo-service
     volumes:
       - "./todo-service/:/home/app"
+      # Don't override node_modules which can be empty on the local machine
+      - "/home/app/node_modules"
     ports:
       - "4000:4000"
     networks:

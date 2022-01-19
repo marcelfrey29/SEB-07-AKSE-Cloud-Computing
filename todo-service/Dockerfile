@@ -5,7 +5,6 @@ WORKDIR /home/app
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install @nestjs/cli
 RUN npm install
 
 COPY . .

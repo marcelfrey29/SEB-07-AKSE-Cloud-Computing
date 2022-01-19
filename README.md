@@ -27,9 +27,11 @@ You need to [allow Mixed-Content](documentation/04.AWS-Setup/README.md#13-disabl
 - [x] **Containerized Backend-Service** built with Nest.js and TypeScript
 - [x] **Keycloak** used for authentication and authorization
 - [x] Runs entirely local with **Docker** and **Docker-Compose**
-- [x] Runs entirely in the cloud on **Amazon Web Services (AWS)**
+- [x] Runs entirely in the cloud on **Amazon Web Services (AWS)**: S3, CloudFront, VPC, EC2, ECS, ECR, RDS, DynamoDB, IAM, Secrets Manager
 - [x] The AWS Infrastructure is **100%** declared with **Terraform**
 - [x] The Application can be continuously deployed via a **CI/CD Pipeline**
+- [x] **Documentation** for building and running the App yourself
+- [x] Documented learnings, problems, challenges, improvements and alternative solutions
 
 ## Documentation and Setup
 
@@ -38,7 +40,7 @@ For a detailed documentation, check out the other README files:
 
 - [Idea for the Project and Requirements](documentation/01.Idea/README.md)
 - [DynamoDB Table Modelling](documentation/02.DynamoDB-Modelling/README.md)
-- [Frontend Application](todo-frontend/README.md)
+- [Frontend-Application](todo-frontend/README.md)
 - [Backend-Service](todo-service/README.md)
 - [Keycloak](keycloak/README.md)
 - [Infrastructure as Code - Terraform](terraform/README.md)
@@ -48,6 +50,7 @@ For a detailed documentation, check out the other README files:
 - [Final Presentation](documentation/06.Final-Presentation/README.md)
 - [Learnings](documentation/07.Learnings-and-Possible-Improvements/LEARNINGS.md)
 - [Possible Improvements](documentation/07.Learnings-and-Possible-Improvements/IMPROVEMENTS.md)
+- Code Comments, sometimes with background infos, problems I had, and solutions for these problems
 
 ## Architecture and Services
 

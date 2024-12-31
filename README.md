@@ -4,13 +4,6 @@ Software Engineering - Selected Topics in Software Engineering (Cloud Computing 
 Heilbronn University<br>
 Marcel Frey (202200)
 
------
-
-Open the Web-App: https://d3tl77k2m239or.cloudfront.net <br>
-You need to [allow Mixed-Content](documentation/04.AWS-Setup/README.md#14-disable-mixed-content) to use the Web-App.
-
------
-
 ## Project Overview
 
 #### Course / Project Objective
